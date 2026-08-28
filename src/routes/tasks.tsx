@@ -53,7 +53,7 @@ const priorityStyles: Record<string, string> = {
 function TasksPage() {
   const run = useServerFn(planTasks);
   const [input, setInput] = useLocalStorage("wai.tasks.input", "");
-  const [mode, setMode] = useLocalStorage<"daily" | "weekly">("wai.tasks.mode", "daily");
+  const [mode, setMode] = useLocalStorage<"daily" | "weekly" | "monthly">("wai.tasks.mode", "daily");
   const [tasks, setTasks] = useLocalStorage<PlannedTask[]>("wai.tasks.list", []);
   const [summary, setSummary] = useLocalStorage("wai.tasks.summary", "");
   const [loading, setLoading] = useState(false);
@@ -114,13 +114,16 @@ function TasksPage() {
             </div>
             <div className="space-y-2">
               <Label>Planning horizon</Label>
-              <Tabs value={mode} onValueChange={(v) => setMode(v as "daily" | "weekly")}>
+              <Tabs value={mode} onValueChange={(v) => setMode(v as "daily" | "weekly" | "monthly")}>
                 <TabsList className="w-full">
                   <TabsTrigger className="flex-1" value="daily">
                     Daily
                   </TabsTrigger>
                   <TabsTrigger className="flex-1" value="weekly">
                     Weekly
+                  </TabsTrigger>
+                  <TabsTrigger className="flex-1" value="monthly">
+                    Monthly
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

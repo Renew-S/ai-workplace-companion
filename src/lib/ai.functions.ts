@@ -41,7 +41,7 @@ export const generateEmail = createServerFn({ method: "POST" })
 
 export const planTasks = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({ tasks: z.string().min(3), mode: z.enum(["daily", "weekly"]) }).parse(input),
+    z.object({ tasks: z.string().min(3), mode: z.enum(["daily", "weekly", "monthly"]) }).parse(input),
   )
   .handler(async ({ data }) => {
     const raw = await callAI([
@@ -53,7 +53,9 @@ export const planTasks = createServerFn({ method: "POST" })
           'Respond with ONLY valid minified JSON of shape {"summary":string,"tasks":[{"title":string,"priority":"High"|"Medium"|"Low","suggestedTime":string,"rationale":string}]}. ' +
           (data.mode === "daily"
             ? "suggestedTime should be a clock slot like '09:00 - 10:00'."
-            : "suggestedTime should be a weekday plus slot like 'Mon, 09:00 - 10:30'.") +
+            : data.mode === "weekly"
+              ? "suggestedTime should be a weekday plus slot like 'Mon, 09:00 - 10:30'."
+              : "suggestedTime should be a calendar date or week like 'Week 1 (1st–7th)' or '15th'.") +
           " Keep rationale under 15 words. No markdown fences.",
       },
       { role: "user", content: data.tasks },
