@@ -108,6 +108,7 @@
 }
 
 @theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --color-primary-soft: var(--primary-soft);
   --background-image-hero: var(--gradient-hero);
   --shadow-soft: var(--shadow-soft);
@@ -120,6 +121,7 @@
   }
 
   body {
+    font-family: var(--font-sans);
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
