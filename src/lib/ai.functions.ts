@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { callAI } from "./ai.server";
+import { callAI, PlanSchema } from "./ai.server";
 
 export const generateEmail = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
@@ -38,18 +38,6 @@ export const generateEmail = createServerFn({ method: "POST" })
     ]);
     return { content };
   });
-
-const PlanSchema = z.object({
-  tasks: z.array(
-    z.object({
-      title: z.string(),
-      priority: z.string(),
-      suggestedTime: z.string(),
-      rationale: z.string(),
-    }),
-  ),
-  summary: z.string(),
-});
 
 export const planTasks = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
 const MODEL = "google/gemini-3.7-flash";
@@ -31,4 +33,17 @@ export async function callAI(messages: Msg[]): Promise<string> {
   if (!content) throw new Error("The AI returned an empty response. Please try again.");
   return content;
 }
+
+
+export const PlanSchema = z.object({
+  tasks: z.array(
+    z.object({
+      title: z.string(),
+      priority: z.string(),
+      suggestedTime: z.string(),
+      rationale: z.string(),
+    }),
+  ),
+  summary: z.string(),
+});
 
