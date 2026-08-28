@@ -1,5 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, LayoutDashboard, Mail, ListChecks, MessageSquare, Sparkles } from "lucide-react";
+import {
+  Menu,
+  LayoutDashboard,
+  Mail,
+  ListChecks,
+  MessageSquare,
+  Sparkles,
+  History,
+  Settings,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
