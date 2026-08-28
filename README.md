@@ -36,7 +36,7 @@ The main objective is to help professionals save time, improve communication, or
 
 ### 📋 AI Task Planner
 
-* Generate **daily or weekly schedules**.
+* Generate **daily, weekly or monthly schedules**.
 * Accept user-provided workplace tasks.
 * AI-assisted task prioritization.
 * Prioritize tasks based on urgency and importance.
