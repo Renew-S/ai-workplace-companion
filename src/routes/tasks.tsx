@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { planTasks } from "@/lib/ai.functions";
+import { logActivity } from "@/lib/history";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/tasks")({
@@ -76,6 +77,7 @@ function TasksPage() {
         })),
       );
       setSummary(res.summary);
+      logActivity("tasks", `${mode[0].toUpperCase()}${mode.slice(1)} plan — ${res.tasks.length} tasks`, res.summary);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {

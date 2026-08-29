@@ -61,6 +61,7 @@ function EmailPage() {
     try {
       const res = await run({ data: { brief, tone, recipient, sender } });
       setOutput(res.content);
+      logActivity("email", brief, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
