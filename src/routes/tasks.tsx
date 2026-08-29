@@ -77,7 +77,11 @@ function TasksPage() {
         })),
       );
       setSummary(res.summary);
-      logActivity("tasks", `${mode[0].toUpperCase()}${mode.slice(1)} plan — ${res.tasks.length} tasks`, res.summary);
+      logActivity(
+        "tasks",
+        `${mode.charAt(0).toUpperCase()}${mode.slice(1)} plan — ${res.tasks.length} tasks`,
+        res.summary,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
