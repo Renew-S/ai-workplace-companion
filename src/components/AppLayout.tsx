@@ -20,6 +20,8 @@ const nav = [
   { to: "/email", label: "Email Generator", icon: Mail },
   { to: "/tasks", label: "Task Planner", icon: ListChecks },
   { to: "/chat", label: "AI Chat", icon: MessageSquare },
+  { to: "/history", label: "History", icon: History },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function Brand() {
