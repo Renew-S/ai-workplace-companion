@@ -1,108 +1,260 @@
 # AI Workplace Productivity Assistant
 
-A modern, responsive AI-powered productivity web application designed to help professionals automate common workplace tasks. The application provides AI-generated content for professional emails, task planning, and workplace assistance through an intuitive SaaS-style dashboard.
+> An AI-powered workplace productivity platform that helps professionals generate emails, organize tasks, create schedules, and receive contextual workplace assistance.
 
 ---
 
 ## 📌 Project Overview
 
-The **AI Workplace Productivity Assistant** combines multiple workplace productivity tools into one simple and user-friendly application.
+**AI Workplace Productivity Assistant** is a modern, responsive SaaS-style web application designed to help professionals automate and simplify everyday workplace tasks using AI.
 
-Users can generate professional emails, create prioritized daily or weekly schedules, and interact with an AI workplace assistant.
+The application provides **AI-generated, contextual responses** rather than generic or hardcoded content.
 
-The application is designed as a **frontend-focused solution** with no user authentication, registration, or traditional backend database.
+Users can:
 
-The main objective is to help professionals save time, improve communication, organize tasks, and make better use of AI in their everyday workplace activities.
+* Generate professional emails using different tones.
+* Create prioritized daily or weekly task schedules.
+* Interact with an AI workplace assistant.
+* Review previous activity through History.
+* Configure language and localization preferences.
+* Enable or disable real-time web search.
+* Edit AI-generated content before using it.
+
+The application is intentionally designed as a **frontend-focused solution** without user accounts, login, registration, or a traditional backend database.
 
 ---
 
-## ✨ Features Implemented
+# ✨ Features Implemented
 
-### 📧 Smart Email Generator
+## 📧 Smart Email Generator
 
-* Generate professional workplace emails using AI.
-* Accept natural-language instructions from the user.
-* Supports multiple tones:
+The Smart Email Generator allows users to create professional workplace emails using AI.
 
-  * Formal
-  * Friendly
-  * Persuasive
-  * Direct
-  * Urgent
-* Editable AI-generated email content.
-* Regenerate responses when needed.
-* Copy generated emails to the clipboard.
-* Clear the current email and start again.
+### Features
 
-### 📋 AI Task Planner
+* Natural-language email instructions.
+* AI-generated professional emails.
+* Multiple communication tones:
 
-* Generate **daily, weekly or monthly schedules**.
-* Accept user-provided workplace tasks.
+  * **Formal**
+  * **Friendly**
+  * **Persuasive**
+  * **Direct**
+  * **Urgent**
+* Editable AI-generated output.
+* Generate and regenerate functionality.
+* Copy generated email to clipboard.
+* Clear/reset functionality.
+
+---
+
+## 📋 AI Task Planner
+
+The AI Task Planner helps users organize and prioritize their workload.
+
+### Features
+
+* Generate **daily schedules**.
+* Generate **weekly schedules**.
+* Generate **monthly schedules.**
+* Enter multiple workplace tasks.
 * AI-assisted task prioritization.
-* Prioritize tasks based on urgency and importance.
-* Display task priority, suggested timing, and status.
+* Prioritization based on urgency and importance.
+* Suggested task timing.
+* Task status tracking.
 * Edit tasks.
 * Delete tasks.
 * Mark tasks as completed.
 
-### 💬 AI Workplace Chatbot
+---
 
-* Interactive AI workplace assistant.
-* Users can ask workplace-related questions.
-* Generate contextual AI responses.
-* Support natural-language prompts.
-* Maintain conversation history during the current session.
-* Clear the current conversation.
+## 💬 AI Workplace Chat
 
-### 📊 Modern Dashboard
+The AI Workplace Chat provides an interactive workplace assistant.
 
-* SaaS-style dashboard interface.
-* Sidebar navigation.
-* Dashboard overview.
-* Email Generator section.
-* Task Planner section.
-* AI Chat section.
-* Responsive mobile navigation.
-* Modern cards, buttons, forms, and UI components.
-* Dove gray and pistachio green color palette.
+The chat interface welcomes users with:
 
-### 🛡️ Responsible AI
+> **"How may I assist today? 😊"**
 
-* Visible Responsible AI disclaimer.
-* Encourages users to verify AI-generated content.
-* Highlights accuracy, privacy, confidentiality, and responsible AI usage.
+### Features
+
+* Natural-language workplace prompts.
+* Contextual AI-generated responses.
+* Workplace productivity assistance.
+* Professional writing assistance.
+* Task organization support.
+* Meeting and planning assistance.
+* Session conversation history.
+* Clear conversation functionality.
+* Optional real-time web search.
+
+AI responses are generated dynamically rather than relying on generic predefined responses.
 
 ---
 
-# 📋 Requirements
+## 📊 Dashboard
 
-## Functional Requirements
+The application includes a modern SaaS-style dashboard.
 
-The application should:
+### Dashboard Features
 
-1. Allow users to generate professional emails using AI.
-2. Provide different email tones.
-3. Allow users to edit generated emails.
-4. Generate daily and weekly task schedules.
-5. Prioritize tasks based on urgency and importance.
-6. Allow users to edit, delete, and complete tasks.
-7. Provide an interactive AI workplace chatbot.
-8. Generate contextual responses to user prompts.
-9. Provide clear navigation between application features.
-10. Work across desktop, tablet, and mobile devices.
-11. Display a Responsible AI disclaimer.
+* Friendly welcome message:
 
-## Non-Functional Requirements
+  **"Welcome to your AI Workplace Productivity Assistant! 😊"**
 
-* Responsive and mobile-friendly.
-* Clean and intuitive user interface.
-* Fast and lightweight frontend.
-* Accessible UI components.
-* Clear error and loading states.
-* No user login or registration.
-* No traditional backend required.
-* AI outputs should be editable.
-* API credentials must not be exposed in source control.
+* Short introduction explaining the available AI tools.
+
+* Quick-access sections for:
+
+  * Email Generator
+  * Task Planner
+  * AI Workplace Chat
+
+* Clean dashboard cards.
+
+* Responsive layout.
+
+* Pistachio-themed interactive tabs and controls.
+
+---
+
+# 🧭 Navigation
+
+The application uses a responsive left-side navigation bar.
+
+### Navigation Items
+
+* 🏠 **Dashboard**
+* ✉️ **Email Generator**
+* 📋 **Task Planner**
+* 💬 **AI Workplace Chat**
+* 🕘 **History**
+* ⚙️ **Settings**
+
+The sidebar adapts to smaller screens and provides intuitive access to all major application features.
+
+---
+
+# 🕘 History
+
+The **History** section allows users to review previous activity.
+
+### Activity Types
+
+History can contain:
+
+* Previously generated emails.
+* Previous task plans.
+* Previous AI chat interactions.
+* Activity type.
+* Date and time.
+* Short content previews.
+
+Users can select an activity to view its details.
+
+Because the application does not use a traditional backend, activity can be stored using **client-side/local storage**.
+
+A useful empty state is displayed when no previous activity exists.
+
+---
+
+# ⚙️ Settings
+
+The Settings section allows users to customize application preferences.
+
+## 🌍 Language & Localization
+
+Users can configure:
+
+* Application language.
+* Date format.
+* Time format.
+* Regional formatting.
+* Number formatting where appropriate.
+
+The settings structure should support adding additional languages in the future.
+
+---
+
+## 🌐 Web Search Access
+
+Settings includes a **Web Search Access** control.
+
+Users can enable or disable real-time web searching for the AI assistant.
+
+### When Enabled
+
+* The AI can use real-time web information when appropriate.
+* The interface indicates when a response uses web search.
+
+### When Disabled
+
+* The AI does not perform real-time web searches.
+* Responses rely on available AI knowledge and conversation context.
+
+The user's preference is stored client-side where appropriate.
+
+---
+
+# 🎨 UI & Design
+
+The application follows a clean, modern, professional **SaaS design system**.
+
+## Color Theme
+
+The primary visual theme consists of:
+
+* **Light dove grey** for the main application background.
+* **Pistachio green** for primary actions and interactive elements.
+
+### Pistachio Green Usage
+
+Pistachio green is used for:
+
+* Primary buttons.
+* Active navigation items.
+* Dashboard tabs.
+* Selected states.
+* Toggles.
+* Highlights.
+* Icons.
+* Interactive accents.
+* Focus and hover states where appropriate.
+
+The application avoids plain white tabs that conflict with the overall theme.
+
+## Design Principles
+
+* Minimal.
+* Modern.
+* Professional.
+* Friendly.
+* Clean.
+* Accessible.
+* Consistent.
+* Responsive.
+
+---
+
+# 📱 Responsive Design
+
+The application is designed for:
+
+* 💻 Desktop
+* 📱 Mobile
+* 📲 Tablet
+
+Responsive behavior applies to:
+
+* Sidebar navigation.
+* Dashboard cards.
+* Tabs.
+* Forms.
+* Email Generator.
+* Task Planner.
+* AI Chat.
+* History.
+* Settings.
 
 ---
 
@@ -111,68 +263,74 @@ The application should:
 The application follows a **frontend-focused architecture**.
 
 ```text
-┌─────────────────────────────────────────────┐
-│                 User Interface              │
-│          React + TypeScript + UI            │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│               Application Pages             │
-│                                             │
-│  Dashboard │ Email Generator │ Task Planner │
-│                       │                     │
-│                  AI Chatbot                 │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│                AI Prompt Layer              │
-│                                             │
-│ Email Prompts │ Task Prompts │ Chat Prompts │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│                  AI Service                 │
-│             AI API / AI Provider            │
-└─────────────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│             Client-Side Storage             │
-│              Local Storage                  │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│                  User Interface              │
+│             React + TypeScript               │
+└───────────────────────┬──────────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────────┐
+│               Application Pages              │
+│                                              │
+│ Dashboard │ Email │ Tasks │ Chat │ History   │
+│                              │               │
+│                           Settings            │
+└───────────────────────┬──────────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────────┐
+│                 AI Prompt Layer              │
+│                                              │
+│ Email Prompts │ Task Prompts │ Chat Prompts  │
+└───────────────────────┬──────────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────────┐
+│                  AI Service                  │
+│                AI API / Provider             │
+└───────────────────────┬──────────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────────┐
+│               Client-Side Storage            │
+│                  Local Storage               │
+│                                              │
+│ History │ Settings │ Preferences │ Activity  │
+└──────────────────────────────────────────────┘
 ```
 
-### Architecture Approach
+### Architecture Responsibilities
 
 The frontend manages:
 
 * User input.
 * Application state.
+* Navigation.
 * UI rendering.
 * AI prompt construction.
 * AI response display.
-* Editing of generated content.
-* Temporary client-side data.
+* Editable AI outputs.
+* History.
+* Settings.
+* User preferences.
+* Client-side storage.
 
-No account management or persistent server-side user database is required.
+No user authentication or traditional server-side database is required.
 
 ---
 
 # 🤖 AI Functionality
 
-The application uses structured prompts to generate useful workplace content.
+The application uses **structured AI prompts** to generate consistent and useful workplace responses.
 
-## Smart Email Generator
+## Email Generation
 
-The email generator combines:
+The email generator uses information such as:
 
 * User instructions.
 * Email purpose.
 * Selected tone.
-* Relevant workplace context.
+* Additional context.
 
 Example prompt structure:
 
@@ -190,57 +348,113 @@ Requirements:
 - Follow the selected tone.
 - Avoid unnecessary wording.
 - Include an appropriate greeting and closing.
-- Return an email that the user can edit before sending.
+- Return an editable email.
 ```
 
-## AI Task Planner
+---
 
-The task planner provides the AI with:
+## Task Planning
 
-* List of tasks.
+The Task Planner provides AI with:
+
+* User tasks.
 * Planning period.
-* Task urgency.
-* Task importance.
-* Optional deadlines.
+* Urgency.
+* Importance.
+* Deadlines where provided.
 
-The AI then produces an organized schedule with recommended priorities and time allocations.
+The AI generates an organized schedule with recommended priorities and timing.
 
-## AI Workplace Chatbot
+---
 
-The chatbot uses a workplace-focused system prompt to provide relevant assistance with:
+## Workplace Chat
+
+The workplace assistant uses a workplace-focused AI prompt to provide contextual assistance with:
 
 * Workplace communication.
 * Productivity.
 * Task organization.
-* Meeting preparation.
 * Professional writing.
+* Meeting preparation.
+* Planning.
 * General workplace questions.
 
-AI responses should be contextual and based on the user's prompt rather than generic predefined responses.
+The assistant should respond based on the user's actual prompt and available context.
+
+---
+
+## Web Search Functionality
+
+Real-time web search is controlled by the user's **Web Search Access** setting.
+
+When enabled, the AI may use current web information when appropriate.
+
+When disabled, the assistant should not perform real-time searches.
+
+The UI should clearly communicate when web information has been used.
+
+---
+
+# 📋 Requirements
+
+## Functional Requirements
+
+The application must:
+
+1. Generate professional emails using AI.
+2. Support Formal, Friendly, Persuasive, Direct, and Urgent tones.
+3. Allow AI-generated emails to be edited.
+4. Generate daily and weekly task schedules.
+5. Prioritize tasks according to urgency and importance.
+6. Allow tasks to be edited, deleted, and completed.
+7. Provide an interactive AI workplace chatbot.
+8. Display **"How may I assist today? 😊"** in the AI Workplace Chat.
+9. Provide contextual AI-generated responses.
+10. Maintain previous activity through History.
+11. Provide configurable language and localization settings.
+12. Provide a Web Search Access toggle.
+13. Allow users to enable or disable real-time searching.
+14. Provide responsive navigation.
+15. Display a Responsible AI disclaimer.
+
+## Non-Functional Requirements
+
+* Responsive across desktop, tablet, and mobile.
+* Clean and intuitive user experience.
+* Accessible UI.
+* Fast frontend performance.
+* Clear loading states.
+* Clear error states.
+* Useful empty states.
+* Editable AI outputs.
+* No login or registration.
+* No traditional backend database.
+* Secure handling of API credentials.
 
 ---
 
 # 🛠️ Technologies and Tools Used
 
-### Frontend
+## Frontend
 
-* **React** – Frontend application framework.
-* **TypeScript** – Type-safe JavaScript development.
-* **Vite** – Development server and build tool.
-* **Tailwind CSS** – Responsive styling.
-* **HTML5 / CSS3** – Web structure and styling.
+* **React** — Frontend framework.
+* **TypeScript** — Type-safe application development.
+* **Vite** — Development server and build tool.
+* **Tailwind CSS** — Responsive styling and UI design.
+* **HTML5 / CSS3** — Web structure and styling.
 
-### AI
+## AI
 
-* **AI API / AI Provider** – Generates workplace emails, schedules, and chatbot responses.
-* **Structured AI Prompts** – Used to improve consistency and relevance of generated responses.
+* **AI API / AI Provider** — AI-generated workplace responses.
+* **Structured AI Prompts** — Consistent and contextual AI generation.
+* **Optional Web Search** — Real-time information when enabled by the user.
 
-### Development Tools
+## Development Tools
 
-* **Lovable** – AI-assisted application development.
-* **Git** – Version control.
-* **GitHub** – Source code hosting and collaboration.
-* **Local Storage** – Client-side storage for temporary application data.
+* **Lovable** — AI-assisted application development.
+* **Git** — Version control.
+* **GitHub** — Repository hosting.
+* **Local Storage** — Client-side persistence for History and Settings.
 
 ---
 
@@ -256,21 +470,25 @@ ai-workplace-productivity-assistant/
 │
 ├── src/
 │   ├── components/
-│   │   ├── Sidebar
-│   │   ├── Dashboard
-│   │   ├── EmailGenerator
-│   │   ├── TaskPlanner
-│   │   ├── Chatbot
-│   │   └── ResponsibleAI
+│   │   ├── Sidebar/
+│   │   ├── Dashboard/
+│   │   ├── EmailGenerator/
+│   │   ├── TaskPlanner/
+│   │   ├── Chatbot/
+│   │   ├── History/
+│   │   ├── Settings/
+│   │   └── ResponsibleAI/
 │   │
 │   ├── pages/
-│   │   ├── Dashboard
-│   │   ├── EmailGenerator
-│   │   ├── TaskPlanner
-│   │   └── AIChat
+│   │   ├── Dashboard/
+│   │   ├── EmailGenerator/
+│   │   ├── TaskPlanner/
+│   │   ├── AIChat/
+│   │   ├── History/
+│   │   └── Settings/
 │   │
 │   ├── services/
-│   │   └── aiService
+│   │   └── aiService/
 │   │
 │   ├── hooks/
 │   │
@@ -290,7 +508,7 @@ ai-workplace-productivity-assistant/
 └── README.md
 ```
 
-> The exact structure may vary depending on the components and configuration generated during development.
+> The exact structure may vary depending on the implementation and components generated during development.
 
 ---
 
@@ -316,7 +534,7 @@ npm install
 
 ## 4. Configure AI Access
 
-If an external AI API is used, create a `.env` file in the project root.
+If an external AI API is required, create a `.env` file in the project root.
 
 Example:
 
@@ -324,9 +542,9 @@ Example:
 VITE_AI_API_KEY=your_api_key_here
 ```
 
-**Never commit API keys or other sensitive credentials to GitHub.**
+> **Important:** Never commit API keys, passwords, tokens, or other sensitive credentials to GitHub.
 
-Make sure `.env` is included in `.gitignore`.
+Add `.env` to `.gitignore`.
 
 ## 5. Start the Development Server
 
@@ -334,13 +552,13 @@ Make sure `.env` is included in `.gitignore`.
 npm run dev
 ```
 
-The application will normally be available at:
+The application will typically be available at:
 
 ```text
 http://localhost:5173
 ```
 
-## 6. Build the Application
+## 6. Build for Production
 
 ```bash
 npm run build
@@ -358,18 +576,18 @@ npm run preview
 
 The application can be deployed using a modern frontend hosting platform.
 
-Suitable options include:
+Possible deployment platforms include:
 
-* **Vercel**
-* **Netlify**
-* **GitHub Pages**
-* **Lovable deployment**
+* Vercel
+* Netlify
+* GitHub Pages
+* Lovable deployment
 
-### General Deployment Process
+## General Deployment Process
 
 1. Push the project to GitHub.
-2. Connect the repository to your chosen hosting platform.
-3. Configure the required environment variables.
+2. Connect the repository to the selected hosting platform.
+3. Configure required environment variables.
 4. Set the build command:
 
 ```bash
@@ -384,25 +602,15 @@ dist
 
 6. Deploy the application.
 
-After deployment, the application will be accessible through the hosting provider's URL or a custom domain.
-
-### Important AI API Consideration
-
-If the AI provider requires a secret API key, **do not expose the secret key directly in browser-side code**.
-
-A frontend-only application should use an AI service that supports the intended client-side architecture, or an appropriate secure intermediary when secret credentials are required.
-
 ---
 
-# 📱 Responsive Design
+## 🔐 AI API Security
 
-The application is designed to work across:
+If the selected AI provider requires a **secret API key**, the key should not be exposed directly in browser-side production code.
 
-* 💻 Desktop
-* 📱 Mobile
-* 📲 Tablet
+A frontend-only implementation should use an AI service designed for client-side use or a secure intermediary when secret credentials are required.
 
-The layout adapts to different screen sizes while maintaining usability, readability, and accessibility.
+Never commit secret credentials to GitHub.
 
 ---
 
@@ -413,36 +621,71 @@ The application does not require:
 * User accounts.
 * Login.
 * Registration.
-* Passwords.
+* Password authentication.
 * A traditional backend database.
 
-Users should avoid entering confidential company information, passwords, personally identifiable information, or sensitive business data into AI prompts.
+Client-side storage may be used for:
 
-AI services may process submitted prompts according to their own privacy policies.
+* History.
+* Settings.
+* User preferences.
+* Temporary activity.
 
----
+Users should avoid entering:
 
-# 🛡️ Responsible AI Disclaimer
+* Confidential company information.
+* Passwords.
+* Financial information.
+* Personally identifiable information.
+* Sensitive business information.
+* Other confidential workplace data.
 
-AI-generated content may contain inaccurate, incomplete, or inappropriate information.
-
-Users should always review and verify AI-generated content before using it for professional communication, planning, or decision-making.
-
-Users should also avoid submitting confidential or sensitive information unless the AI service being used provides appropriate data protection.
-
-The AI assistant is intended to **support human productivity, not replace human judgment**.
-
----
-
-# 📄 License
-
-This project is intended for educational, demonstration, and portfolio purposes.
-
-If you plan to distribute the project publicly, add an appropriate open-source license such as the MIT License.
+Users should also consider the privacy policies and data-handling practices of any external AI or web-search services used by the application.
 
 ---
 
-# 👨‍💻 Contributing
+# 🛡️ Responsible AI
+
+AI-generated information may contain:
+
+* Errors.
+* Incomplete information.
+* Incorrect assumptions.
+* Inappropriate recommendations.
+
+Users should review and verify AI-generated content before using it for professional communication, planning, or decision-making.
+
+The application encourages:
+
+* Human oversight.
+* Accuracy checking.
+* Privacy awareness.
+* Confidentiality.
+* Responsible AI usage.
+
+**The AI assistant is designed to support human productivity, not replace human judgment.**
+
+---
+
+# 📈 Future Improvements
+
+Potential future enhancements include:
+
+* Additional language support.
+* More email templates.
+* Calendar integration.
+* Advanced task analytics.
+* Custom AI instructions.
+* Export generated emails and schedules.
+* More advanced web-search controls.
+* Voice interaction.
+* Collaboration features.
+* Optional secure user accounts.
+* Cloud synchronization.
+
+---
+
+# 🤝 Contributing
 
 Contributions and suggestions are welcome.
 
@@ -450,9 +693,34 @@ To contribute:
 
 1. Fork the repository.
 2. Create a feature branch.
+
+```bash
+git checkout -b feature/your-feature
+```
+
 3. Make your changes.
 4. Test the application.
-5. Submit a pull request.
+5. Commit your changes.
+
+```bash
+git commit -m "Add your feature"
+```
+
+6. Push the branch.
+
+```bash
+git push origin feature/your-feature
+```
+
+7. Open a pull request.
+
+---
+
+# 📄 License
+
+This project is intended for educational, demonstration, and portfolio purposes.
+
+If you plan to distribute the project publicly, add an appropriate open-source license such as the **MIT License**.
 
 ---
 
@@ -460,11 +728,14 @@ To contribute:
 
 The goal of the **AI Workplace Productivity Assistant** is to demonstrate how AI can be integrated into a modern productivity platform to help professionals:
 
-* Communicate more effectively.
-* Organize their workload.
-* Prioritize important tasks.
-* Create schedules.
-* Get workplace assistance.
-* Save time on repetitive tasks.
+* ✉️ Communicate more effectively.
+* 📋 Organize their workload.
+* 🎯 Prioritize important tasks.
+* 📅 Create daily and weekly schedules.
+* 💬 Receive workplace assistance.
+* 🕘 Review previous activity.
+* ⚙️ Customize their experience.
+* 🌐 Access real-time information when desired.
+* ⏱️ Save time on repetitive workplace tasks.
 
-**AI-powered productivity, designed around the modern workplace.**
+> **AI-powered productivity, designed around the modern workplace.**
