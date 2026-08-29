@@ -79,6 +79,8 @@ export const chatReply = createServerFn({ method: "POST" })
         messages: z.array(
           z.object({ role: z.enum(["user", "assistant"]), content: z.string() }),
         ),
+        language: z.string().optional(),
+        webSearch: z.boolean().optional(),
       })
       .parse(input),
   )
@@ -90,7 +92,11 @@ export const chatReply = createServerFn({ method: "POST" })
           "You are a helpful workplace productivity assistant for busy professionals. Give practical, specific, " +
           "actionable answers about emails, meetings, planning, prioritisation, difficult conversations, documents and " +
           "workplace processes. Be concise (under 200 words unless asked for more), use short paragraphs or bullet lines " +
-          "with '- '. Avoid legal, medical or HR-binding advice; suggest consulting the right person instead.",
+          "with '- '. Avoid legal, medical or HR-binding advice; suggest consulting the right person instead." +
+          (data.language ? ` Always reply in ${data.language}.` : "") +
+          (data.webSearch
+            ? " Real-time web search is enabled: you may reference current, time-sensitive information, but flag anything you are unsure about."
+            : " Real-time web search is disabled: rely only on general knowledge and say when information may be out of date."),
       },
       ...data.messages.slice(-20),
     ]);

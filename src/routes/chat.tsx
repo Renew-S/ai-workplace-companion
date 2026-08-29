@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { chatReply } from "@/lib/ai.functions";
+import { logActivity } from "@/lib/history";
+import { DEFAULT_SETTINGS, SETTINGS_KEY, type AppSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/chat")({
@@ -41,6 +43,7 @@ const SUGGESTIONS = [
 function ChatPage() {
   const run = useServerFn(chatReply);
   const [messages, setMessages] = useLocalStorage<Message[]>("wai.chat.messages", []);
+  const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +62,11 @@ function ChatPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await run({ data: { messages: next } });
+      const res = await run({
+        data: { messages: next, language: settings.language, webSearch: settings.webSearch },
+      });
       setMessages([...next, { role: "assistant", content: res.content }]);
+      logActivity("chat", content, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
@@ -93,6 +99,7 @@ function ChatPage() {
           {messages.length === 0 && !loading ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
               <MessageSquare className="size-7 text-primary" />
+              <p className="text-base font-semibold">How may I assist today? 😊</p>
               <p className="text-sm text-muted-foreground">
                 Start a conversation — try one of these:
               </p>

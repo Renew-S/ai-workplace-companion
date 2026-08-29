@@ -54,8 +54,11 @@ function Dashboard() {
           <Zap className="size-3.5 text-primary" /> Powered by AI
         </span>
         <h1 className="mt-4 max-w-2xl text-3xl font-semibold sm:text-4xl">
-          Get workplace work done, faster.
+          Welcome back 😊 Get workplace work done, faster.
         </h1>
+        <p className="mt-2 max-w-xl text-sm font-medium text-foreground">
+          Great to see you — pick a tool below and let&apos;s make today lighter.
+        </p>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
           Context-aware AI for the everyday tasks that eat your day: writing emails, planning
           priorities, and answering workplace questions.

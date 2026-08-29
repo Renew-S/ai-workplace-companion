@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { logActivity } from "@/lib/history";
 import { generateEmail } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/email")({
@@ -61,6 +62,7 @@ function EmailPage() {
     try {
       const res = await run({ data: { brief, tone, recipient, sender } });
       setOutput(res.content);
+      logActivity("email", brief, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
