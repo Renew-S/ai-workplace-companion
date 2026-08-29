@@ -59,8 +59,11 @@ function ChatPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await run({ data: { messages: next } });
+      const res = await run({
+        data: { messages: next, language: settings.language, webSearch: settings.webSearch },
+      });
       setMessages([...next, { role: "assistant", content: res.content }]);
+      logActivity("chat", content, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
