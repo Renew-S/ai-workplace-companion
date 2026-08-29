@@ -93,6 +93,7 @@ function ChatPage() {
           {messages.length === 0 && !loading ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
               <MessageSquare className="size-7 text-primary" />
+              <p className="text-base font-semibold">How may I assist today? 😊</p>
               <p className="text-sm text-muted-foreground">
                 Start a conversation — try one of these:
               </p>
