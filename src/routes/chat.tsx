@@ -43,6 +43,7 @@ const SUGGESTIONS = [
 function ChatPage() {
   const run = useServerFn(chatReply);
   const [messages, setMessages] = useLocalStorage<Message[]>("wai.chat.messages", []);
+  const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
