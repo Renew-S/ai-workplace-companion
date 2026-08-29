@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { logActivity } from "@/lib/history";
 import { generateEmail } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/email")({
