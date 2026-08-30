@@ -80,13 +80,13 @@ function Dashboard() {
           <Link key={f.to} to={f.to} className="group">
             <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-soft)]">
               <CardHeader>
-                <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary-foreground">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                   <f.icon className="size-5" />
                 </span>
                 <CardTitle className="mt-3 text-base">{f.title}</CardTitle>
                 <CardDescription>{f.description}</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm font-medium text-muted-foreground group-hover:text-foreground">
+              <CardContent className="text-sm font-medium text-primary-deep">
                 Open <ArrowRight className="ml-1 inline size-3.5" />
               </CardContent>
             </Card>
