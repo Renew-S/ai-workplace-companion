@@ -50,12 +50,12 @@ function Dashboard() {
   return (
     <AppLayout>
       <section className="overflow-hidden rounded-2xl bg-hero p-6 shadow-[var(--shadow-soft)] sm:p-10">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
-          <Zap className="size-3.5 text-primary" /> Powered by AI
-        </span>
-        <h1 className="mt-4 max-w-2xl text-3xl font-semibold sm:text-4xl">
-          Welcome back 😊 Get workplace work done, faster.
+        <h1 className="max-w-2xl text-3xl font-semibold sm:text-4xl">
+          Welcome to your AI Workplace Productivity Assistant! 😊
         </h1>
+        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+          <Zap className="size-3.5 text-primary-deep" /> Powered by AI
+        </span>
         <p className="mt-2 max-w-xl text-sm font-medium text-foreground">
           Great to see you — pick a tool below and let&apos;s make today lighter.
         </p>
@@ -80,13 +80,13 @@ function Dashboard() {
           <Link key={f.to} to={f.to} className="group">
             <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-soft)]">
               <CardHeader>
-                <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary-foreground">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                   <f.icon className="size-5" />
                 </span>
                 <CardTitle className="mt-3 text-base">{f.title}</CardTitle>
                 <CardDescription>{f.description}</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm font-medium text-muted-foreground group-hover:text-foreground">
+              <CardContent className="text-sm font-medium text-primary-deep">
                 Open <ArrowRight className="ml-1 inline size-3.5" />
               </CardContent>
             </Card>
