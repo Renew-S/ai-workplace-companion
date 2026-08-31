@@ -1,6 +1,14 @@
 import { z } from "zod";
 
-type Msg = { role: "system" | "user" | "assistant"; content: string };
+export type ContentBlock =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } }
+  | { type: "file"; file: { filename: string; file_data: string } };
+
+type Msg = {
+  role: "system" | "user" | "assistant";
+  content: string | ContentBlock[];
+};
 
 const MODEL = "google/gemini-3.7-flash";
 const FALLBACK_MODEL = "google/gemini-2.5-flash";
