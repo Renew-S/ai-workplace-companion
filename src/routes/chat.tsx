@@ -168,7 +168,10 @@ function ChatPage() {
             messages.map((m, i) => (
               <div
                 key={i}
-                className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+                className={cn(
+                  "flex flex-col gap-1.5",
+                  m.role === "user" ? "items-end" : "items-start",
+                )}
               >
                 <div
                   className={cn(
@@ -180,6 +183,60 @@ function ChatPage() {
                 >
                   {m.content}
                 </div>
+                {m.role === "assistant" && (
+                  <div className="flex items-center gap-1 pl-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Like this response"
+                      title="Like"
+                      className={cn(
+                        "size-8 text-muted-foreground hover:text-primary-deep",
+                        feedback[i] === "up" && "text-primary-deep",
+                      )}
+                      onClick={() => rate(i, "up")}
+                    >
+                      <ThumbsUp className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Dislike this response"
+                      title="Dislike"
+                      className={cn(
+                        "size-8 text-muted-foreground hover:text-destructive",
+                        feedback[i] === "down" && "text-destructive",
+                      )}
+                      onClick={() => rate(i, "down")}
+                    >
+                      <ThumbsDown className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Copy message"
+                      title="Copy message"
+                      className="size-8 text-muted-foreground hover:text-primary-deep"
+                      onClick={() => copyMessage(i, m.content)}
+                    >
+                      {copiedIndex === i ? (
+                        <Check className="size-4" />
+                      ) : (
+                        <Copy className="size-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Share message and prompt"
+                      title="Share message and prompt"
+                      className="size-8 text-muted-foreground hover:text-primary-deep"
+                      onClick={() => shareMessage(i, m.content)}
+                    >
+                      <Share2 className="size-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))
           )}
