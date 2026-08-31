@@ -89,12 +89,13 @@ function ChatPage() {
   async function shareMessage(index: number, text: string) {
     const prompt = [...messages.slice(0, index)].reverse().find((m) => m.role === "user")?.content;
     const payload = `Prompt: ${prompt ?? "—"}\n\nAI response:\n${text}`;
+    const nav: Navigator = navigator;
     try {
-      if (typeof navigator !== "undefined" && "share" in navigator) {
-        await (navigator as Navigator).share({ title: "AI Workplace Chat", text: payload });
+      if (typeof nav.share === "function") {
+        await nav.share({ title: "AI Workplace Chat", text: payload });
         return;
       }
-      await navigator.clipboard.writeText(payload);
+      await nav.clipboard.writeText(payload);
       toast.success("Prompt and response copied to share");
     } catch {
       /* user dismissed share sheet */
