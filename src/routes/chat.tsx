@@ -59,6 +59,47 @@ function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const [feedback, setFeedback] = useLocalStorage<Record<number, "up" | "down">>(
+    "wai.chat.feedback",
+    {},
+  );
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  function rate(index: number, value: "up" | "down") {
+    const current = feedback[index];
+    const next = { ...feedback };
+    if (current === value) delete next[index];
+    else next[index] = value;
+    setFeedback(next);
+    if (current !== value)
+      toast.success(value === "up" ? "Thanks for the feedback!" : "Thanks — we'll aim to improve.");
+  }
+
+  async function copyMessage(index: number, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 1500);
+      toast.success("Message copied");
+    } catch {
+      toast.error("Could not copy the message.");
+    }
+  }
+
+  async function shareMessage(index: number, text: string) {
+    const prompt = [...messages.slice(0, index)].reverse().find((m) => m.role === "user")?.content;
+    const payload = `Prompt: ${prompt ?? "—"}\n\nAI response:\n${text}`;
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await (navigator as Navigator).share({ title: "AI Workplace Chat", text: payload });
+        return;
+      }
+      await navigator.clipboard.writeText(payload);
+      toast.success("Prompt and response copied to share");
+    } catch {
+      /* user dismissed share sheet */
+    }
+  }
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
