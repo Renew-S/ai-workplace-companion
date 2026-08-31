@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MessageSquare, SendHorizonal, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Loader2,
+  MessageSquare,
+  SendHorizonal,
+  Share2,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 import { AppLayout, PageHeader, ResponsibleAiNotice } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
