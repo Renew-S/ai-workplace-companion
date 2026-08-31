@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MessageSquare, SendHorizonal, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Loader2,
+  MessageSquare,
+  SendHorizonal,
+  Share2,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 import { AppLayout, PageHeader, ResponsibleAiNotice } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -48,6 +59,48 @@ function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const [feedback, setFeedback] = useLocalStorage<Record<number, "up" | "down">>(
+    "wai.chat.feedback",
+    {},
+  );
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  function rate(index: number, value: "up" | "down") {
+    const current = feedback[index];
+    const next = { ...feedback };
+    if (current === value) delete next[index];
+    else next[index] = value;
+    setFeedback(next);
+    if (current !== value)
+      toast.success(value === "up" ? "Thanks for the feedback!" : "Thanks — we'll aim to improve.");
+  }
+
+  async function copyMessage(index: number, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 1500);
+      toast.success("Message copied");
+    } catch {
+      toast.error("Could not copy the message.");
+    }
+  }
+
+  async function shareMessage(index: number, text: string) {
+    const prompt = [...messages.slice(0, index)].reverse().find((m) => m.role === "user")?.content;
+    const payload = `Prompt: ${prompt ?? "—"}\n\nAI response:\n${text}`;
+    const nav: Navigator = navigator;
+    try {
+      if (typeof nav.share === "function") {
+        await nav.share({ title: "AI Workplace Chat", text: payload });
+        return;
+      }
+      await nav.clipboard.writeText(payload);
+      toast.success("Prompt and response copied to share");
+    } catch {
+      /* user dismissed share sheet */
+    }
+  }
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -115,7 +168,10 @@ function ChatPage() {
             messages.map((m, i) => (
               <div
                 key={i}
-                className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+                className={cn(
+                  "flex flex-col gap-1.5",
+                  m.role === "user" ? "items-end" : "items-start",
+                )}
               >
                 <div
                   className={cn(
@@ -127,6 +183,60 @@ function ChatPage() {
                 >
                   {m.content}
                 </div>
+                {m.role === "assistant" && (
+                  <div className="flex items-center gap-1 pl-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Like this response"
+                      title="Like"
+                      className={cn(
+                        "size-8 text-muted-foreground hover:text-primary-deep",
+                        feedback[i] === "up" && "text-primary-deep",
+                      )}
+                      onClick={() => rate(i, "up")}
+                    >
+                      <ThumbsUp className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Dislike this response"
+                      title="Dislike"
+                      className={cn(
+                        "size-8 text-muted-foreground hover:text-destructive",
+                        feedback[i] === "down" && "text-destructive",
+                      )}
+                      onClick={() => rate(i, "down")}
+                    >
+                      <ThumbsDown className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Copy message"
+                      title="Copy message"
+                      className="size-8 text-muted-foreground hover:text-primary-deep"
+                      onClick={() => copyMessage(i, m.content)}
+                    >
+                      {copiedIndex === i ? (
+                        <Check className="size-4" />
+                      ) : (
+                        <Copy className="size-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Share message and prompt"
+                      title="Share message and prompt"
+                      className="size-8 text-muted-foreground hover:text-primary-deep"
+                      onClick={() => shareMessage(i, m.content)}
+                    >
+                      <Share2 className="size-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))
           )}
