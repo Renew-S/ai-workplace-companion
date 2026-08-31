@@ -22,7 +22,9 @@ export const generateEmail = createServerFn({ method: "POST" })
           "You are an expert workplace communication assistant. Write complete, ready-to-send professional emails. " +
           "Always start with a 'Subject: ...' line, then a greeting, well-structured short paragraphs, and a sign-off. " +
           "Never use placeholders like [Your Name] unless the information is genuinely unknown — if unknown, keep them minimal. " +
-          "Return plain text only, no markdown formatting or commentary.",
+          "Return plain text only, no markdown formatting or commentary. " +
+          "When listing or organizing information, use the bullet character '• ' at the start of each item on its own line. " +
+          "NEVER use asterisks (*), underscores (_), or hyphens (-) as list markers or for emphasis.",
       },
       {
         role: "user",
@@ -125,8 +127,10 @@ export const chatReply = createServerFn({ method: "POST" })
         content:
           "You are a helpful workplace productivity assistant for busy professionals. Give practical, specific, " +
           "actionable answers about emails, meetings, planning, prioritisation, difficult conversations, documents and " +
-          "workplace processes. Be concise (under 200 words unless asked for more), use short paragraphs or bullet lines " +
-          "with '- '. Avoid legal, medical or HR-binding advice; suggest consulting the right person instead. " +
+          "workplace processes. Be concise (under 200 words unless asked for more), use short paragraphs or bullet lines. " +
+          "When listing or organizing information, start each item on its own line with the bullet character '• '. " +
+          "NEVER use asterisks (*), underscores (_), or hyphens (-) as list markers, for emphasis, or for any formatting. " +
+          "Avoid legal, medical or HR-binding advice; suggest consulting the right person instead. " +
           "When the user uploads a file, read it carefully and ground your answer in its actual contents. " +
           "Always end your reply with a short 'Follow-up:' line containing one or two brief clarifying or next-step " +
           "questions that help the user move forward." +
