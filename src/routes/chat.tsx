@@ -6,6 +6,8 @@ import {
   Copy,
   Loader2,
   MessageSquare,
+  Paperclip,
+  X,
   SendHorizonal,
   Share2,
   ThumbsDown,
@@ -45,6 +47,14 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
+type Attachment = {
+  name: string;
+  mimeType: string;
+  kind: "image" | "pdf" | "text";
+  dataUrl?: string;
+  text?: string;
+};
+
 const SUGGESTIONS = [
   "Help me decline a meeting politely",
   "Draft an agenda for a 30-minute project check-in",
@@ -64,6 +74,52 @@ function ChatPage() {
     {},
   );
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function kindFor(file: File): Attachment["kind"] | null {
+    if (file.type.startsWith("image/")) return "image";
+    if (file.type === "application/pdf") return "pdf";
+    if (
+      file.type.startsWith("text/") ||
+      /\.(txt|md|csv|json|ts|tsx|js|jsx|html|css|yml|yaml|log)$/i.test(file.name) ||
+      file.type === "application/json"
+    )
+      return "text";
+    return null;
+  }
+
+  async function addFiles(files: FileList | null) {
+    if (!files) return;
+    const next: Attachment[] = [];
+    for (const file of Array.from(files).slice(0, 5)) {
+      const kind = kindFor(file);
+      if (!kind) {
+        toast.error(`${file.name}: unsupported file type. Use images, PDFs or text files.`);
+        continue;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        toast.error(`${file.name} is larger than 8MB.`);
+        continue;
+      }
+      try {
+        if (kind === "text") {
+          next.push({ name: file.name, mimeType: file.type || "text/plain", kind, text: await file.text() });
+        } else {
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(new Error("read failed"));
+            reader.readAsDataURL(file);
+          });
+          next.push({ name: file.name, mimeType: file.type, kind, dataUrl });
+        }
+      } catch {
+        toast.error(`Could not read ${file.name}.`);
+      }
+    }
+    if (next.length) setAttachments((prev) => [...prev, ...next].slice(0, 5));
+  }
 
   function rate(index: number, value: "up" | "down") {
     const current = feedback[index];
@@ -108,15 +164,25 @@ function ChatPage() {
 
   async function send(text: string) {
     const content = text.trim();
-    if (!content || loading) return;
-    const next: Message[] = [...messages, { role: "user", content }];
+    if ((!content && attachments.length === 0) || loading) return;
+    const label = attachments.length
+      ? `${content || "Please review the attached file(s)."}\n\n📎 ${attachments.map((a) => a.name).join(", ")}`
+      : content;
+    const sent = attachments;
+    const next: Message[] = [...messages, { role: "user", content: label }];
     setMessages(next);
     setInput("");
+    setAttachments([]);
     setLoading(true);
     setError(null);
     try {
       const res = await run({
-        data: { messages: next, language: settings.language, webSearch: settings.webSearch },
+        data: {
+          messages: next,
+          language: settings.language,
+          webSearch: settings.webSearch,
+          attachments: sent,
+        },
       });
       setMessages([...next, { role: "assistant", content: res.content }]);
       logActivity("chat", content, res.content);
@@ -250,6 +316,27 @@ function ChatPage() {
         </CardContent>
 
         <div className="border-t bg-card p-3 sm:p-4">
+          {attachments.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {attachments.map((a, i) => (
+                <span
+                  key={`${a.name}-${i}`}
+                  className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs text-foreground"
+                >
+                  <Paperclip className="size-3 text-primary-deep" />
+                  {a.name}
+                  <button
+                    type="button"
+                    aria-label={`Remove ${a.name}`}
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
+                  >
+                    <X className="size-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
           <form
             className="flex items-end gap-2"
             onSubmit={(e) => {
@@ -257,10 +344,32 @@ function ChatPage() {
               send(input);
             }}
           >
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              accept="image/*,application/pdf,text/*,.md,.csv,.json,.log,.yml,.yaml"
+              onChange={(e) => {
+                void addFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Upload a file"
+              title="Upload a file"
+              className="text-primary-deep"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Paperclip className="size-4" />
+            </Button>
             <Textarea
               rows={1}
               value={input}
-              placeholder="Ask about emails, meetings, planning…"
+              placeholder="Ask about emails, meetings, planning, or an uploaded file…"
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -270,7 +379,11 @@ function ChatPage() {
               }}
               className="max-h-32 min-h-11 resize-none"
             />
-            <Button type="submit" size="icon" disabled={loading || !input.trim()}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={loading || (!input.trim() && attachments.length === 0)}
+            >
               <SendHorizonal className="size-4" />
             </Button>
           </form>

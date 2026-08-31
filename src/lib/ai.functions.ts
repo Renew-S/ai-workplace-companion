@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { callAI, PlanSchema } from "./ai.server";
+import { callAI, PlanSchema, type ContentBlock } from "./ai.server";
 
 export const generateEmail = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
@@ -81,10 +81,44 @@ export const chatReply = createServerFn({ method: "POST" })
         ),
         language: z.string().optional(),
         webSearch: z.boolean().optional(),
+        attachments: z
+          .array(
+            z.object({
+              name: z.string(),
+              mimeType: z.string(),
+              kind: z.enum(["image", "pdf", "text"]),
+              dataUrl: z.string().optional(),
+              text: z.string().optional(),
+            }),
+          )
+          .optional(),
       })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    const history = data.messages.slice(-20);
+    const attachments = data.attachments ?? [];
+
+    let messages: Parameters<typeof callAI>[0] = history;
+
+    if (attachments.length > 0 && history.length > 0) {
+      const last = history[history.length - 1]!;
+      const blocks: ContentBlock[] = [{ type: "text", text: last.content }];
+      for (const a of attachments) {
+        if (a.kind === "image" && a.dataUrl) {
+          blocks.push({ type: "image_url", image_url: { url: a.dataUrl } });
+        } else if (a.kind === "pdf" && a.dataUrl) {
+          blocks.push({ type: "file", file: { filename: a.name, file_data: a.dataUrl } });
+        } else if (a.text) {
+          blocks.push({
+            type: "text",
+            text: `Contents of uploaded file "${a.name}":\n${a.text.slice(0, 60000)}`,
+          });
+        }
+      }
+      messages = [...history.slice(0, -1), { role: "user", content: blocks }];
+    }
+
     const content = await callAI([
       {
         role: "system",
@@ -93,6 +127,7 @@ export const chatReply = createServerFn({ method: "POST" })
           "actionable answers about emails, meetings, planning, prioritisation, difficult conversations, documents and " +
           "workplace processes. Be concise (under 200 words unless asked for more), use short paragraphs or bullet lines " +
           "with '- '. Avoid legal, medical or HR-binding advice; suggest consulting the right person instead. " +
+          "When the user uploads a file, read it carefully and ground your answer in its actual contents. " +
           "Always end your reply with a short 'Follow-up:' line containing one or two brief clarifying or next-step " +
           "questions that help the user move forward." +
           (data.language ? ` Always reply in ${data.language}.` : "") +
@@ -100,7 +135,8 @@ export const chatReply = createServerFn({ method: "POST" })
             ? " Real-time web search is enabled: you may reference current, time-sensitive information, but flag anything you are unsure about."
             : " Real-time web search is disabled: rely only on general knowledge and say when information may be out of date."),
       },
-      ...data.messages.slice(-20),
+      ...messages,
     ]);
     return { content };
   });
+
