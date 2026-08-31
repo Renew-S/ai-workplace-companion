@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { callAI, PlanSchema } from "./ai.server";
+import { callAI, PlanSchema, type ContentBlock } from "./ai.server";
 
 export const generateEmail = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
