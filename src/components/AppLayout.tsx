@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -103,23 +104,28 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b bg-background/85 px-4 py-3 backdrop-blur lg:hidden">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open navigation">
-                <Menu className="size-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-sidebar p-4">
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <Brand />
-              <NavItems onNavigate={() => setOpen(false)} />
-              <div className="mt-6">
-                <ResponsibleAiNotice />
-              </div>
-            </SheetContent>
-          </Sheet>
-          <Brand />
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b bg-background/85 px-4 py-3 backdrop-blur">
+          <div className="flex items-center gap-3 lg:hidden">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Open navigation">
+                  <Menu className="size-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 bg-sidebar p-4">
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
+                <Brand />
+                <NavItems onNavigate={() => setOpen(false)} />
+                <div className="mt-6">
+                  <ResponsibleAiNotice />
+                </div>
+              </SheetContent>
+            </Sheet>
+            <Brand />
+          </div>
+          <div className="ml-auto">
+            <NotificationsBell />
+          </div>
         </div>
 
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
