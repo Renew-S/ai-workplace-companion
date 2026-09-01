@@ -54,7 +54,8 @@ function Dashboard() {
           <Zap className="size-3.5 text-primary-deep" /> Powered by AI
         </span>
         <h1 className="mt-4 max-w-2xl text-3xl font-semibold sm:text-4xl">
-          Welcome to your AI Workplace Productivity Assistant! 😊
+          Welcome to your <span className="text-ombre">AI</span> Workplace Productivity{" "}
+          <span className="text-ombre">Assistant</span>! 😊
         </h1>
         <p className="mt-2 max-w-xl text-sm font-medium text-foreground">
           Great to see you — pick a tool below and let&apos;s make today lighter.
@@ -78,7 +79,7 @@ function Dashboard() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => (
           <Link key={f.to} to={f.to} className="group">
-            <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-soft)]">
+            <Card className="h-full transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-[var(--shadow-glow-strong)] group-focus-visible:border-primary/40 group-focus-visible:shadow-[var(--shadow-glow-strong)]">
               <CardHeader>
                 <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                   <f.icon className="size-5" />
@@ -94,7 +95,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <Card className="mt-6">
+      <Card className="mt-6 bg-hero shadow-[var(--shadow-soft)]">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ShieldCheck className="size-4 text-primary" /> Responsible AI
