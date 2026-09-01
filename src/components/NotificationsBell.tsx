@@ -28,9 +28,7 @@ export function NotificationsBell() {
   const [open, setOpen] = useState(false);
 
   const due = Object.entries(plans ?? {}).flatMap(([mode, plan]) =>
-    (plan?.tasks ?? [])
-      .filter((t) => !t.done)
-      .map((t) => ({ ...t, mode })),
+    (plan?.tasks ?? []).filter((t) => !t.done).map((t) => ({ ...t, mode })),
   );
   const urgent = due.filter((t) => t.priority?.toLowerCase() === "high").length;
 

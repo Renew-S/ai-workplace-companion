@@ -49,6 +49,19 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  onend: (() => void) | null;
+};
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
 type Attachment = {
   name: string;
   mimeType: string;
@@ -79,30 +92,35 @@ function ChatPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   function toggleVoice() {
     if (listening) {
       recognitionRef.current?.stop();
       return;
     }
-    const w = window as any;
+    const w = window as unknown as {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
     const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
     if (!SR) {
       toast.error("Speech recognition isn't supported in this browser. Try Chrome or Edge.");
       return;
     }
     const recognition = new SR();
-    recognition.lang = settings.language && settings.language !== "auto" ? settings.language : "en-US";
+    recognition.lang =
+      settings.language && settings.language !== "auto" ? settings.language : "en-US";
     recognition.continuous = false;
     recognition.interimResults = true;
     const base = input ? `${input} ` : "";
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       let transcript = "";
-      for (let i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
+      for (let i = 0; i < event.results.length; i++)
+        transcript += event.results[i]?.[0]?.transcript ?? "";
       setInput(base + transcript);
     };
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       setListening(false);
       if (event.error === "not-allowed" || event.error === "service-not-allowed")
         toast.error("Microphone access was blocked. Allow it in your browser settings.");
@@ -147,7 +165,12 @@ function ChatPage() {
       }
       try {
         if (kind === "text") {
-          next.push({ name: file.name, mimeType: file.type || "text/plain", kind, text: await file.text() });
+          next.push({
+            name: file.name,
+            mimeType: file.type || "text/plain",
+            kind,
+            text: await file.text(),
+          });
         } else {
           const dataUrl = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
