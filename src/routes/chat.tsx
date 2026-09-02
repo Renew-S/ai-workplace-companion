@@ -49,9 +49,6 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
-type Attachment2 = never;
-
-
 type Attachment = {
   name: string;
   mimeType: string;
@@ -68,6 +65,7 @@ const SUGGESTIONS = [
 
 function ChatPage() {
   const run = useServerFn(chatReply);
+  const transcribe = useServerFn(transcribeAudio);
   const [messages, setMessages] = useLocalStorage<Message[]>("wai.chat.messages", []);
   const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [input, setInput] = useState("");
@@ -82,51 +80,60 @@ function ChatPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const [transcribing, setTranscribing] = useState(false);
+  const recorderRef = useRef<Recorder | null>(null);
 
-  function toggleVoice() {
+  async function toggleVoice() {
+    if (transcribing) return;
+
     if (listening) {
-      recognitionRef.current?.stop();
-      return;
-    }
-    const w = window as unknown as {
-      SpeechRecognition?: SpeechRecognitionCtor;
-      webkitSpeechRecognition?: SpeechRecognitionCtor;
-    };
-    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-    if (!SR) {
-      toast.error("Speech recognition isn't supported in this browser. Try Chrome or Edge.");
-      return;
-    }
-    const recognition = new SR();
-    recognition.lang =
-      settings.language && settings.language !== "auto" ? settings.language : "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    const base = input ? `${input} ` : "";
-    recognition.onresult = (event) => {
-      let transcript = "";
-      for (let i = 0; i < event.results.length; i++)
-        transcript += event.results[i]?.[0]?.transcript ?? "";
-      setInput(base + transcript);
-    };
-    recognition.onerror = (event) => {
+      const recorder = recorderRef.current;
+      recorderRef.current = null;
       setListening(false);
-      if (event.error === "not-allowed" || event.error === "service-not-allowed")
-        toast.error("Microphone access was blocked. Allow it in your browser settings.");
-      else if (event.error === "no-speech") toast.error("No speech detected — please try again.");
-      else toast.error("Could not capture your voice. Please try again.");
-    };
-    recognition.onend = () => setListening(false);
+      if (!recorder) return;
+      setTranscribing(true);
+      try {
+        const blob = await recorder.stop();
+        if (blob.size < 4096) {
+          toast.error("That recording was empty — please try again.");
+          return;
+        }
+        const audioBase64 = await blobToBase64(blob);
+        const res = await transcribe({
+          data: { audioBase64, mimeType: "audio/wav", language: settings.language },
+        });
+        const text = res.text.trim();
+        if (!text) {
+          toast.error("No speech detected — please try again.");
+          return;
+        }
+        setInput((prev) => (prev ? `${prev.trim()} ${text}` : text));
+        toast.success("Voice captured");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Could not transcribe your voice.");
+      } finally {
+        setTranscribing(false);
+      }
+      return;
+    }
+
     try {
-      recognition.start();
-      recognitionRef.current = recognition;
+      recorderRef.current = await startRecording();
       setListening(true);
-      toast.success("Listening… speak your prompt.");
-    } catch {
-      toast.error("Could not start the microphone.");
+      toast.success("Listening… tap the mic again when you're done.");
+    } catch (e) {
+      const message =
+        e instanceof DOMException && (e.name === "NotAllowedError" || e.name === "SecurityError")
+          ? "Microphone access was blocked. Allow it in your browser settings."
+          : e instanceof DOMException && e.name === "NotFoundError"
+            ? "No microphone was found on this device."
+            : e instanceof Error
+              ? e.message
+              : "Could not start the microphone.";
+      toast.error(message);
     }
   }
+
 
   function kindFor(file: File): Attachment["kind"] | null {
     if (file.type.startsWith("image/")) return "image";
