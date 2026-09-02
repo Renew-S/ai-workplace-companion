@@ -38,9 +38,12 @@ export function logActivity(kind: ActivityKind, title: string, detail: string) {
   const item: ActivityItem = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     kind,
-    title,
+    title: title.length > 120 ? `${title.slice(0, 120)}…` : title,
     detail: detail.length > 180 ? `${detail.slice(0, 180)}…` : detail,
+    prompt: title,
+    output: detail,
     at: Date.now(),
   };
+
   writeHistory([item, ...readHistory()]);
 }
