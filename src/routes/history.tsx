@@ -1,14 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { History as HistoryIcon, Mail, ListChecks, MessageSquare, Trash2 } from "lucide-react";
+import {
+  Copy,
+  History as HistoryIcon,
+  Mail,
+  ListChecks,
+  MessageSquare,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 import { AppLayout, PageHeader, ResponsibleAiNotice } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { readHistory, writeHistory, type ActivityItem } from "@/lib/history";
 import { DEFAULT_SETTINGS, SETTINGS_KEY, formatDateTime, type AppSettings } from "@/lib/settings";
+
 
 export const Route = createFileRoute("/history")({
   head: () => ({
