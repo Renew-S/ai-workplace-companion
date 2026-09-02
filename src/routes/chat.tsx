@@ -23,7 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { chatReply } from "@/lib/ai.functions";
+import { chatReply, transcribeAudio } from "@/lib/ai.functions";
+import { blobToBase64, startRecording, type Recorder } from "@/lib/audio";
+
 import { logActivity } from "@/lib/history";
 import { DEFAULT_SETTINGS, SETTINGS_KEY, type AppSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
@@ -49,19 +51,6 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
-type SpeechRecognitionLike = {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-};
-
-type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
-
 type Attachment = {
   name: string;
   mimeType: string;
@@ -78,6 +67,7 @@ const SUGGESTIONS = [
 
 function ChatPage() {
   const run = useServerFn(chatReply);
+  const transcribe = useServerFn(transcribeAudio);
   const [messages, setMessages] = useLocalStorage<Message[]>("wai.chat.messages", []);
   const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [input, setInput] = useState("");
@@ -92,51 +82,60 @@ function ChatPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const [transcribing, setTranscribing] = useState(false);
+  const recorderRef = useRef<Recorder | null>(null);
 
-  function toggleVoice() {
+  async function toggleVoice() {
+    if (transcribing) return;
+
     if (listening) {
-      recognitionRef.current?.stop();
-      return;
-    }
-    const w = window as unknown as {
-      SpeechRecognition?: SpeechRecognitionCtor;
-      webkitSpeechRecognition?: SpeechRecognitionCtor;
-    };
-    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-    if (!SR) {
-      toast.error("Speech recognition isn't supported in this browser. Try Chrome or Edge.");
-      return;
-    }
-    const recognition = new SR();
-    recognition.lang =
-      settings.language && settings.language !== "auto" ? settings.language : "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    const base = input ? `${input} ` : "";
-    recognition.onresult = (event) => {
-      let transcript = "";
-      for (let i = 0; i < event.results.length; i++)
-        transcript += event.results[i]?.[0]?.transcript ?? "";
-      setInput(base + transcript);
-    };
-    recognition.onerror = (event) => {
+      const recorder = recorderRef.current;
+      recorderRef.current = null;
       setListening(false);
-      if (event.error === "not-allowed" || event.error === "service-not-allowed")
-        toast.error("Microphone access was blocked. Allow it in your browser settings.");
-      else if (event.error === "no-speech") toast.error("No speech detected — please try again.");
-      else toast.error("Could not capture your voice. Please try again.");
-    };
-    recognition.onend = () => setListening(false);
+      if (!recorder) return;
+      setTranscribing(true);
+      try {
+        const blob = await recorder.stop();
+        if (blob.size < 4096) {
+          toast.error("That recording was empty — please try again.");
+          return;
+        }
+        const audioBase64 = await blobToBase64(blob);
+        const res = await transcribe({
+          data: { audioBase64, mimeType: "audio/wav", language: settings.language },
+        });
+        const text = res.text.trim();
+        if (!text) {
+          toast.error("No speech detected — please try again.");
+          return;
+        }
+        setInput((prev) => (prev ? `${prev.trim()} ${text}` : text));
+        toast.success("Voice captured");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Could not transcribe your voice.");
+      } finally {
+        setTranscribing(false);
+      }
+      return;
+    }
+
     try {
-      recognition.start();
-      recognitionRef.current = recognition;
+      recorderRef.current = await startRecording();
       setListening(true);
-      toast.success("Listening… speak your prompt.");
-    } catch {
-      toast.error("Could not start the microphone.");
+      toast.success("Listening… tap the mic again when you're done.");
+    } catch (e) {
+      const message =
+        e instanceof DOMException && (e.name === "NotAllowedError" || e.name === "SecurityError")
+          ? "Microphone access was blocked. Allow it in your browser settings."
+          : e instanceof DOMException && e.name === "NotFoundError"
+            ? "No microphone was found on this device."
+            : e instanceof Error
+              ? e.message
+              : "Could not start the microphone.";
+      toast.error(message);
     }
   }
+
 
   function kindFor(file: File): Attachment["kind"] | null {
     if (file.type.startsWith("image/")) return "image";
@@ -279,7 +278,7 @@ function ChatPage() {
         </Button>
       </div>
 
-      <Card className="flex h-[62vh] min-h-[420px] flex-col overflow-hidden py-0">
+      <Card className="flex h-[78vh] min-h-[560px] flex-col overflow-hidden py-0">
         <CardContent className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
           {messages.length === 0 && !loading ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
@@ -436,12 +435,20 @@ function ChatPage() {
               type="button"
               variant={listening ? "default" : "outline"}
               size="icon"
+              disabled={transcribing}
               aria-label={listening ? "Stop voice input" : "Speak your prompt"}
               title={listening ? "Stop listening" : "Speak your prompt"}
               className={cn(!listening && "text-primary-deep", listening && "animate-pulse")}
-              onClick={toggleVoice}
+              onClick={() => void toggleVoice()}
             >
-              {listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+              {transcribing ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : listening ? (
+                <MicOff className="size-4" />
+              ) : (
+                <Mic className="size-4" />
+              )}
+
             </Button>
             <Textarea
               rows={1}

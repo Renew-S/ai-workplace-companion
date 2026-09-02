@@ -1,14 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { History as HistoryIcon, Mail, ListChecks, MessageSquare, Trash2 } from "lucide-react";
+import {
+  Copy,
+  History as HistoryIcon,
+  Mail,
+  ListChecks,
+  MessageSquare,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 import { AppLayout, PageHeader, ResponsibleAiNotice } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { readHistory, writeHistory, type ActivityItem } from "@/lib/history";
 import { DEFAULT_SETTINGS, SETTINGS_KEY, formatDateTime, type AppSettings } from "@/lib/settings";
+
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -35,6 +51,17 @@ const labels = { email: "Email", tasks: "Task plan", chat: "Chat" } as const;
 function HistoryPage() {
   const [items, setItems] = useState<ActivityItem[]>([]);
   const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
+  const [active, setActive] = useState<ActivityItem | null>(null);
+
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Could not copy the text.");
+    }
+  }
+
 
   useEffect(() => {
     const sync = () => setItems(readHistory());
@@ -76,7 +103,19 @@ function HistoryPage() {
             const Icon = icons[item.kind];
             return (
               <li key={item.id}>
-                <Card>
+                <Card
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Preview activity: ${item.title}`}
+                  onClick={() => setActive(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActive(item);
+                    }
+                  }}
+                  className="cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-glow-strong)] focus-visible:outline-none focus-visible:border-primary/40 focus-visible:shadow-[var(--shadow-glow-strong)]"
+                >
                   <CardContent className="flex gap-3 pt-6">
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-foreground">
                       <Icon className="size-4" />
@@ -92,6 +131,9 @@ function HistoryPage() {
                       <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
                         {item.detail}
                       </p>
+                      <p className="mt-2 text-xs font-medium text-primary-deep">
+                        Select to preview the full prompt and response
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -100,6 +142,54 @@ function HistoryPage() {
           })}
         </ul>
       )}
+
+      <Dialog open={active !== null} onOpenChange={(open) => !open && setActive(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{active ? labels[active.kind] : "Activity"}</DialogTitle>
+            <DialogDescription>
+              {active ? formatDateTime(active.at, settings) : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {active && (
+            <div className="space-y-4">
+              <section>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">Your prompt</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary-deep"
+                    onClick={() => copy(active.prompt ?? active.title)}
+                  >
+                    <Copy className="size-3.5" /> Copy
+                  </Button>
+                </div>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm">
+                  {active.prompt ?? active.title}
+                </p>
+              </section>
+              <section>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">AI response</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary-deep"
+                    onClick={() => copy(active.output ?? active.detail)}
+                  >
+                    <Copy className="size-3.5" /> Copy
+                  </Button>
+                </div>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm leading-relaxed">
+                  {active.output ?? active.detail}
+                </p>
+              </section>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
       <ResponsibleAiNotice className="mt-4" />
     </AppLayout>

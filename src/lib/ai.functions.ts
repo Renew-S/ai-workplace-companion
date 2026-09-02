@@ -144,3 +144,46 @@ export const chatReply = createServerFn({ method: "POST" })
     return { content };
   });
 
+
+export const transcribeAudio = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        audioBase64: z.string().min(100),
+        mimeType: z.string().default("audio/wav"),
+        language: z.string().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const key = process.env["LOVABLE_API_KEY"];
+    if (!key) throw new Error("Voice input is not configured for this app.");
+
+    const binary = Uint8Array.from(atob(data.audioBase64), (c) => c.charCodeAt(0));
+    if (binary.byteLength < 2048)
+      throw new Error("That recording was too short or silent — please try again.");
+
+    const form = new FormData();
+    form.append("model", "openai/gpt-4o-mini-transcribe");
+    form.append("file", new Blob([binary], { type: data.mimeType }), "recording.wav");
+    const lang = data.language && data.language !== "auto" ? data.language.slice(0, 2) : "";
+    if (lang) form.append("language", lang);
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      if (res.status === 429)
+        throw new Error("Too many requests right now — please wait a moment and try again.");
+      if (res.status === 402)
+        throw new Error("AI credits are exhausted. Please add credits to continue.");
+      throw new Error(`Transcription failed (${res.status}). ${text.slice(0, 200)}`);
+    }
+
+    const json = (await res.json()) as { text?: string };
+    return { text: (json.text ?? "").trim() };
+  });
