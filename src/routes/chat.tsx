@@ -435,12 +435,20 @@ function ChatPage() {
               type="button"
               variant={listening ? "default" : "outline"}
               size="icon"
+              disabled={transcribing}
               aria-label={listening ? "Stop voice input" : "Speak your prompt"}
               title={listening ? "Stop listening" : "Speak your prompt"}
               className={cn(!listening && "text-primary-deep", listening && "animate-pulse")}
-              onClick={toggleVoice}
+              onClick={() => void toggleVoice()}
             >
-              {listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+              {transcribing ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : listening ? (
+                <MicOff className="size-4" />
+              ) : (
+                <Mic className="size-4" />
+              )}
+
             </Button>
             <Textarea
               rows={1}
