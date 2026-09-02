@@ -278,7 +278,7 @@ function ChatPage() {
         </Button>
       </div>
 
-      <Card className="flex h-[62vh] min-h-[420px] flex-col overflow-hidden py-0">
+      <Card className="flex h-[78vh] min-h-[560px] flex-col overflow-hidden py-0">
         <CardContent className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
           {messages.length === 0 && !loading ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
