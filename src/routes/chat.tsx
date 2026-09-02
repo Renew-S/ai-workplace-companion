@@ -49,18 +49,8 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
-type SpeechRecognitionLike = {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-};
+type Attachment2 = never;
 
-type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
 type Attachment = {
   name: string;
