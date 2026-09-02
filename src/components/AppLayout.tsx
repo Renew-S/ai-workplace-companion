@@ -70,7 +70,7 @@ export function ResponsibleAiNotice({ className }: { className?: string }) {
   return (
     <p
       className={cn(
-        "rounded-lg border border-dashed bg-muted/60 p-3 text-xs leading-relaxed text-muted-foreground",
+        "rounded-lg border border-[var(--card-border)] bg-hero p-3 text-xs leading-relaxed text-muted-foreground shadow-[var(--shadow-soft)]",
         className,
       )}
     >
