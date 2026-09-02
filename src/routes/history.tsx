@@ -76,7 +76,19 @@ function HistoryPage() {
             const Icon = icons[item.kind];
             return (
               <li key={item.id}>
-                <Card>
+                <Card
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Preview activity: ${item.title}`}
+                  onClick={() => setActive(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActive(item);
+                    }
+                  }}
+                  className="cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-glow-strong)] focus-visible:outline-none focus-visible:border-primary/40 focus-visible:shadow-[var(--shadow-glow-strong)]"
+                >
                   <CardContent className="flex gap-3 pt-6">
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-foreground">
                       <Icon className="size-4" />
@@ -92,6 +104,9 @@ function HistoryPage() {
                       <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
                         {item.detail}
                       </p>
+                      <p className="mt-2 text-xs font-medium text-primary-deep">
+                        Select to preview the full prompt and response
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -100,6 +115,54 @@ function HistoryPage() {
           })}
         </ul>
       )}
+
+      <Dialog open={active !== null} onOpenChange={(open) => !open && setActive(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{active ? labels[active.kind] : "Activity"}</DialogTitle>
+            <DialogDescription>
+              {active ? formatDateTime(active.at, settings) : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {active && (
+            <div className="space-y-4">
+              <section>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">Your prompt</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary-deep"
+                    onClick={() => copy(active.prompt ?? active.title)}
+                  >
+                    <Copy className="size-3.5" /> Copy
+                  </Button>
+                </div>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm">
+                  {active.prompt ?? active.title}
+                </p>
+              </section>
+              <section>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">AI response</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary-deep"
+                    onClick={() => copy(active.output ?? active.detail)}
+                  >
+                    <Copy className="size-3.5" /> Copy
+                  </Button>
+                </div>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm leading-relaxed">
+                  {active.output ?? active.detail}
+                </p>
+              </section>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
       <ResponsibleAiNotice className="mt-4" />
     </AppLayout>
