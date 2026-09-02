@@ -5,8 +5,13 @@ export type ActivityItem = {
   kind: ActivityKind;
   title: string;
   detail: string;
+  /** Full user prompt (untruncated) */
+  prompt?: string;
+  /** Full AI output (untruncated) */
+  output?: string;
   at: number;
 };
+
 
 const KEY = "wai.history";
 const LIMIT = 60;
