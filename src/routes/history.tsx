@@ -51,6 +51,17 @@ const labels = { email: "Email", tasks: "Task plan", chat: "Chat" } as const;
 function HistoryPage() {
   const [items, setItems] = useState<ActivityItem[]>([]);
   const [settings] = useLocalStorage<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
+  const [active, setActive] = useState<ActivityItem | null>(null);
+
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Could not copy the text.");
+    }
+  }
+
 
   useEffect(() => {
     const sync = () => setItems(readHistory());
