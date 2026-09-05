@@ -96,6 +96,9 @@ function TasksPage() {
   const [plans, setPlans] = useLocalStorage<Plans>("wai.tasks.plans", emptyPlans);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTime, setNewTime] = useState("");
+  const [newPriority, setNewPriority] = useState("Medium");
 
   const plan = plans[mode] ?? emptyPlans[mode];
   const tasks = plan.tasks;
