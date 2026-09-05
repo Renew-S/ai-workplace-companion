@@ -120,6 +120,9 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --color-primary-soft: var(--primary-soft);
   --color-primary-deep: var(--primary-deep);
+  --color-rose-dust: var(--rose-dust);
+  --color-rose-dust-soft: var(--rose-dust-soft);
+  --color-rose-dust-foreground: var(--rose-dust-foreground);
   --background-image-hero: var(--gradient-hero);
   --shadow-soft: var(--shadow-soft);
   --shadow-glow: var(--shadow-glow);
