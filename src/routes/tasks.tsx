@@ -1,14 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Check, ClipboardList, ListChecks, Loader2, Sparkles, Trash2, Undo2 } from "lucide-react";
+import {
+  Check,
+  ClipboardList,
+  ListChecks,
+  Loader2,
+  Plus,
+  Sparkles,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppLayout, PageHeader, ResponsibleAiNotice } from "@/components/AppLayout";
+import { MonthCalendar } from "@/components/MonthCalendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -79,6 +96,9 @@ function TasksPage() {
   const [plans, setPlans] = useLocalStorage<Plans>("wai.tasks.plans", emptyPlans);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTime, setNewTime] = useState("");
+  const [newPriority, setNewPriority] = useState("Medium");
 
   const plan = plans[mode] ?? emptyPlans[mode];
   const tasks = plan.tasks;
@@ -141,6 +161,37 @@ function TasksPage() {
     }));
   }
 
+  function addTask() {
+    const title = newTitle.trim();
+    if (!title) {
+      toast.error("Give the task a name first.");
+      return;
+    }
+    setPlans((prev) => {
+      const current = prev[mode] ?? { summary: "", tasks: [] };
+      return {
+        ...prev,
+        [mode]: {
+          ...current,
+          tasks: [
+            ...current.tasks,
+            {
+              id: `${Date.now()}-manual`,
+              title,
+              priority: newPriority,
+              suggestedTime: newTime.trim() || "Unscheduled",
+              rationale: "Added manually",
+              done: false,
+            },
+          ],
+        },
+      };
+    });
+    setNewTitle("");
+    setNewTime("");
+    toast.success("Task added to your plan.");
+  }
+
   function clearPlan() {
     setPlans((prev) => ({ ...prev, [mode]: { summary: "", tasks: [] } }));
   }
@@ -158,7 +209,12 @@ function TasksPage() {
         description="Drop in your tasks and get a prioritized schedule you can edit, complete and clear."
       />
 
+      <div className="mb-5">
+        <MonthCalendar />
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
+
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="text-base">Your tasks</CardTitle>
@@ -241,6 +297,47 @@ function TasksPage() {
                 </Card>
               )}
 
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Add a task to your {modeLabels[mode].toLowerCase()} plan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Input
+                    aria-label="New task"
+                    placeholder="What needs doing?"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") addTask();
+                    }}
+                    className="flex-1"
+                  />
+                  <Input
+                    aria-label="Suggested time"
+                    placeholder="Time e.g. 09:00 - 10:00"
+                    value={newTime}
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="sm:w-48"
+                  />
+                  <Select value={newPriority} onValueChange={setNewPriority}>
+                    <SelectTrigger className="sm:w-32" aria-label="Priority">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addTask}>
+                    <Plus className="size-4" /> Add
+                  </Button>
+                </CardContent>
+              </Card>
+
+
               {loading && tasks.length === 0 ? (
                 <Card>
                   <CardContent className="flex h-64 flex-col items-center justify-center gap-3 pt-6 text-sm text-muted-foreground">
@@ -272,17 +369,34 @@ function TasksPage() {
                               )}
                             />
                             <div className="flex flex-wrap items-center gap-2 text-xs">
-                              <Badge
-                                variant="outline"
-                                className={priorityStyles[t.priority.toLowerCase()] ?? ""}
+                              <Select
+                                value={t.priority}
+                                onValueChange={(v) => update(t.id, { priority: v })}
                               >
-                                {t.priority}
-                              </Badge>
-                              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">
-                                {t.suggestedTime}
-                              </span>
+                                <SelectTrigger
+                                  aria-label="Priority"
+                                  className={cn(
+                                    "h-7 w-28 text-xs",
+                                    priorityStyles[t.priority.toLowerCase()] ?? "",
+                                  )}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="High">High</SelectItem>
+                                  <SelectItem value="Medium">Medium</SelectItem>
+                                  <SelectItem value="Low">Low</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input
+                                aria-label="Suggested time"
+                                value={t.suggestedTime}
+                                onChange={(e) => update(t.id, { suggestedTime: e.target.value })}
+                                className="h-7 w-44 bg-muted text-xs"
+                              />
                               <span className="text-muted-foreground">{t.rationale}</span>
                             </div>
+
                           </div>
                           <div className="flex gap-2">
                             <Button
