@@ -369,17 +369,34 @@ function TasksPage() {
                               )}
                             />
                             <div className="flex flex-wrap items-center gap-2 text-xs">
-                              <Badge
-                                variant="outline"
-                                className={priorityStyles[t.priority.toLowerCase()] ?? ""}
+                              <Select
+                                value={t.priority}
+                                onValueChange={(v) => update(t.id, { priority: v })}
                               >
-                                {t.priority}
-                              </Badge>
-                              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">
-                                {t.suggestedTime}
-                              </span>
+                                <SelectTrigger
+                                  aria-label="Priority"
+                                  className={cn(
+                                    "h-7 w-28 text-xs",
+                                    priorityStyles[t.priority.toLowerCase()] ?? "",
+                                  )}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="High">High</SelectItem>
+                                  <SelectItem value="Medium">Medium</SelectItem>
+                                  <SelectItem value="Low">Low</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input
+                                aria-label="Suggested time"
+                                value={t.suggestedTime}
+                                onChange={(e) => update(t.id, { suggestedTime: e.target.value })}
+                                className="h-7 w-44 bg-muted text-xs"
+                              />
                               <span className="text-muted-foreground">{t.rationale}</span>
                             </div>
+
                           </div>
                           <div className="flex gap-2">
                             <Button
