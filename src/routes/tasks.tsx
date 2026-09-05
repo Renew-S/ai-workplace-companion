@@ -158,6 +158,37 @@ function TasksPage() {
     }));
   }
 
+  function addTask() {
+    const title = newTitle.trim();
+    if (!title) {
+      toast.error("Give the task a name first.");
+      return;
+    }
+    setPlans((prev) => {
+      const current = prev[mode] ?? { summary: "", tasks: [] };
+      return {
+        ...prev,
+        [mode]: {
+          ...current,
+          tasks: [
+            ...current.tasks,
+            {
+              id: `${Date.now()}-manual`,
+              title,
+              priority: newPriority,
+              suggestedTime: newTime.trim() || "Unscheduled",
+              rationale: "Added manually",
+              done: false,
+            },
+          ],
+        },
+      };
+    });
+    setNewTitle("");
+    setNewTime("");
+    toast.success("Task added to your plan.");
+  }
+
   function clearPlan() {
     setPlans((prev) => ({ ...prev, [mode]: { summary: "", tasks: [] } }));
   }
@@ -175,7 +206,12 @@ function TasksPage() {
         description="Drop in your tasks and get a prioritized schedule you can edit, complete and clear."
       />
 
+      <div className="mb-5">
+        <MonthCalendar />
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
+
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="text-base">Your tasks</CardTitle>
