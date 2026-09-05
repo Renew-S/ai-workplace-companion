@@ -297,6 +297,47 @@ function TasksPage() {
                 </Card>
               )}
 
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Add a task to your {modeLabels[mode].toLowerCase()} plan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Input
+                    aria-label="New task"
+                    placeholder="What needs doing?"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") addTask();
+                    }}
+                    className="flex-1"
+                  />
+                  <Input
+                    aria-label="Suggested time"
+                    placeholder="Time e.g. 09:00 - 10:00"
+                    value={newTime}
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="sm:w-48"
+                  />
+                  <Select value={newPriority} onValueChange={setNewPriority}>
+                    <SelectTrigger className="sm:w-32" aria-label="Priority">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addTask}>
+                    <Plus className="size-4" /> Add
+                  </Button>
+                </CardContent>
+              </Card>
+
+
               {loading && tasks.length === 0 ? (
                 <Card>
                   <CardContent className="flex h-64 flex-col items-center justify-center gap-3 pt-6 text-sm text-muted-foreground">
