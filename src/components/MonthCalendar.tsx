@@ -12,8 +12,17 @@ type CalendarTask = {
   title: string;
   priority: string;
   dueDate?: string;
+  suggestedTime?: string;
   done?: boolean;
 };
+
+/** Falls back to reading a day-of-month out of text like "15th" or "Week 2 (8th–14th)". */
+function dayFromText(text: string | undefined, daysInMonth: number): number | null {
+  if (!text) return null;
+  const match = text.match(/(\d{1,2})\s*(?:st|nd|rd|th)/i) ?? text.match(/\b(\d{1,2})\b/);
+  const day = match ? Number(match[1]) : NaN;
+  return Number.isFinite(day) && day >= 1 && day <= daysInMonth ? day : null;
+}
 
 function sameDay(a: Date, b: Date) {
   return (
@@ -46,11 +55,19 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
   const dots = useMemo(() => {
     const map: Record<string, "high" | "medium" | "low"> = {};
     const rank: Record<string, number> = { high: 3, medium: 2, low: 1 };
+    const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
     for (const task of tasks ?? []) {
-      if (task.done || !task.dueDate) continue;
-      const [y, m, d] = task.dueDate.split("-").map(Number);
-      if (!y || !m || !d) continue;
-      const dt = new Date(y, m - 1, d);
+      if (task.done) continue;
+      let dt: Date | null = null;
+      if (task.dueDate) {
+        const [y, m, d] = task.dueDate.split("-").map(Number);
+        if (y && m && d) dt = new Date(y, m - 1, d);
+      }
+      if (!dt) {
+        const day = dayFromText(task.suggestedTime, daysInMonth);
+        if (day) dt = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+      }
+      if (!dt) continue;
       if (dt.getMonth() !== cursor.getMonth() || dt.getFullYear() !== cursor.getFullYear()) continue;
       const key = localDateKey(dt);
       const p = task.priority?.toLowerCase();
