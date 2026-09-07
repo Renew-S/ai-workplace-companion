@@ -75,6 +75,7 @@ export const PlanSchema = z.object({
       priority: z.string(),
       suggestedTime: z.string(),
       rationale: z.string(),
+      dueDate: z.string().optional(),
     }),
   ),
   summary: z.string(),

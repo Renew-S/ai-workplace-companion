@@ -61,6 +61,7 @@ type PlannedTask = {
   priority: string;
   suggestedTime: string;
   rationale: string;
+  dueDate?: string;
   done: boolean;
 };
 
@@ -99,6 +100,7 @@ function TasksPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newTime, setNewTime] = useState("");
   const [newPriority, setNewPriority] = useState("Medium");
+  const [newDue, setNewDue] = useState("");
 
   const plan = plans[mode] ?? emptyPlans[mode];
   const tasks = plan.tasks;
@@ -181,6 +183,7 @@ function TasksPage() {
               priority: newPriority,
               suggestedTime: newTime.trim() || "Unscheduled",
               rationale: "Added manually",
+              dueDate: newDue || undefined,
               done: false,
             },
           ],
@@ -189,6 +192,7 @@ function TasksPage() {
     });
     setNewTitle("");
     setNewTime("");
+    setNewDue("");
     toast.success("Task added to your plan.");
   }
 
@@ -210,7 +214,7 @@ function TasksPage() {
       />
 
       <div className="mb-5">
-        <MonthCalendar />
+        <MonthCalendar tasks={plans.monthly?.tasks ?? []} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
@@ -321,6 +325,13 @@ function TasksPage() {
                     onChange={(e) => setNewTime(e.target.value)}
                     className="sm:w-48"
                   />
+                  <Input
+                    type="date"
+                    aria-label="Due date"
+                    value={newDue}
+                    onChange={(e) => setNewDue(e.target.value)}
+                    className="sm:w-40"
+                  />
                   <Select value={newPriority} onValueChange={setNewPriority}>
                     <SelectTrigger className="sm:w-32" aria-label="Priority">
                       <SelectValue />
@@ -392,8 +403,17 @@ function TasksPage() {
                                 aria-label="Suggested time"
                                 value={t.suggestedTime}
                                 onChange={(e) => update(t.id, { suggestedTime: e.target.value })}
-                                className="h-7 w-44 bg-muted text-xs"
-                              />
+                                 className="h-7 w-44 bg-muted text-xs"
+                               />
+                               <Input
+                                 type="date"
+                                 aria-label="Due date"
+                                 value={t.dueDate ?? ""}
+                                 onChange={(e) =>
+                                   update(t.id, { dueDate: e.target.value })
+                                 }
+                                 className="h-7 w-36 bg-muted text-xs"
+                               />
                               <span className="text-muted-foreground">{t.rationale}</span>
                             </div>
 

@@ -55,7 +55,9 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
       const key = localDateKey(dt);
       const p = task.priority?.toLowerCase();
       if (!p || !(p in rank)) continue;
-      if ((rank[p] ?? 0) > (rank[map[key]] ?? 0)) map[key] = p as "high" | "medium" | "low";
+      const current = map[key];
+      const currentRank = current ? (rank[current] ?? 0) : 0;
+      if ((rank[p] ?? 0) > currentRank) map[key] = p as "high" | "medium" | "low";
     }
     return map;
   }, [tasks, cursor]);
