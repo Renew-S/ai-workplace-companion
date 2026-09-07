@@ -52,12 +52,12 @@ export const planTasks = createServerFn({ method: "POST" })
         content:
           "You are a productivity planning assistant. Given a list of workplace tasks, produce a prioritized " +
           `${data.mode} schedule using urgency and importance (Eisenhower style). ` +
-          'Respond with ONLY valid minified JSON of shape {"summary":string,"tasks":[{"title":string,"priority":"High"|"Medium"|"Low","suggestedTime":string,"rationale":string}]}. ' +
+          'Respond with ONLY valid minified JSON of shape {"summary":string,"tasks":[{"title":string,"priority":"High"|"Medium"|"Low","suggestedTime":string,"rationale":string,"dueDate":string}]}. ' +
           (data.mode === "daily"
-            ? "suggestedTime should be a clock slot like '09:00 - 10:00'."
+            ? "suggestedTime should be a clock slot like '09:00 - 10:00'. Omit dueDate."
             : data.mode === "weekly"
-              ? "suggestedTime should be a weekday plus slot like 'Mon, 09:00 - 10:30'."
-              : "suggestedTime should be a calendar date or week like 'Week 1 (1st–7th)' or '15th'.") +
+              ? "suggestedTime should be a weekday plus slot like 'Mon, 09:00 - 10:30'. Omit dueDate."
+              : `suggestedTime should be a calendar date or week like 'Week 1 (1st–7th)' or '15th'. Also set dueDate to the exact day the task is due or begins, formatted YYYY-MM-DD, within the current month starting ${new Date().toISOString().slice(0, 10)}.`) +
           " Keep rationale under 15 words. No markdown fences.",
       },
       { role: "user", content: data.tasks },
