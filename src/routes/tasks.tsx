@@ -61,6 +61,7 @@ type PlannedTask = {
   priority: string;
   suggestedTime: string;
   rationale: string;
+  dueDate?: string;
   done: boolean;
 };
 
@@ -99,6 +100,7 @@ function TasksPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newTime, setNewTime] = useState("");
   const [newPriority, setNewPriority] = useState("Medium");
+  const [newDue, setNewDue] = useState("");
 
   const plan = plans[mode] ?? emptyPlans[mode];
   const tasks = plan.tasks;
@@ -181,6 +183,7 @@ function TasksPage() {
               priority: newPriority,
               suggestedTime: newTime.trim() || "Unscheduled",
               rationale: "Added manually",
+              dueDate: newDue || undefined,
               done: false,
             },
           ],
@@ -189,6 +192,7 @@ function TasksPage() {
     });
     setNewTitle("");
     setNewTime("");
+    setNewDue("");
     toast.success("Task added to your plan.");
   }
 
@@ -210,7 +214,7 @@ function TasksPage() {
       />
 
       <div className="mb-5">
-        <MonthCalendar />
+        <MonthCalendar tasks={plans.monthly?.tasks ?? []} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
