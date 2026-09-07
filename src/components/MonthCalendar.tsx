@@ -12,8 +12,17 @@ type CalendarTask = {
   title: string;
   priority: string;
   dueDate?: string;
+  suggestedTime?: string;
   done?: boolean;
 };
+
+/** Falls back to reading a day-of-month out of text like "15th" or "Week 2 (8th–14th)". */
+function dayFromText(text: string | undefined, daysInMonth: number): number | null {
+  if (!text) return null;
+  const match = text.match(/(\d{1,2})\s*(?:st|nd|rd|th)/i) ?? text.match(/\b(\d{1,2})\b/);
+  const day = match ? Number(match[1]) : NaN;
+  return Number.isFinite(day) && day >= 1 && day <= daysInMonth ? day : null;
+}
 
 function sameDay(a: Date, b: Date) {
   return (
