@@ -410,7 +410,7 @@ function TasksPage() {
                                  aria-label="Due date"
                                  value={t.dueDate ?? ""}
                                  onChange={(e) =>
-                                   update(t.id, { dueDate: e.target.value || undefined })
+                                   update(t.id, { dueDate: e.target.value })
                                  }
                                  className="h-7 w-36 bg-muted text-xs"
                                />
