@@ -36,7 +36,13 @@ function localDateKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
+export function MonthCalendar({
+  tasks,
+  highlightedTaskId,
+}: {
+  tasks?: CalendarTask[];
+  highlightedTaskId?: string | null;
+}) {
   const today = useMemo(() => new Date(), []);
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -52,8 +58,9 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
     return list;
   }, [cursor]);
 
-  const dots = useMemo(() => {
+  const { dots, titles } = useMemo(() => {
     const map: Record<string, "high" | "medium" | "low"> = {};
+    const taskTitles: Record<string, string[]> = {};
     const rank: Record<string, number> = { high: 3, medium: 2, low: 1 };
     const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
     for (const task of tasks ?? []) {
@@ -75,9 +82,33 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
       const current = map[key];
       const currentRank = current ? (rank[current] ?? 0) : 0;
       if ((rank[p] ?? 0) > currentRank) map[key] = p as "high" | "medium" | "low";
+      if (!taskTitles[key]) taskTitles[key] = [];
+      taskTitles[key].push(task.title);
     }
-    return map;
+    return { dots: map, titles: taskTitles };
   }, [tasks, cursor]);
+
+  const highlightedDates = useMemo(() => {
+    const set = new Set<string>();
+    if (!highlightedTaskId || !tasks) return set;
+    const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+    for (const task of tasks) {
+      if (task.id !== highlightedTaskId || task.done) continue;
+      let dt: Date | null = null;
+      if (task.dueDate) {
+        const [y, m, d] = task.dueDate.split("-").map(Number);
+        if (y && m && d) dt = new Date(y, m - 1, d);
+      }
+      if (!dt) {
+        const day = dayFromText(task.suggestedTime, daysInMonth);
+        if (day) dt = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+      }
+      if (dt && dt.getMonth() === cursor.getMonth() && dt.getFullYear() === cursor.getFullYear()) {
+        set.add(localDateKey(dt));
+      }
+    }
+    return set;
+  }, [tasks, highlightedTaskId, cursor]);
 
   const dotClass: Record<string, string> = {
     high: "bg-[var(--priority-high)]",
@@ -135,7 +166,9 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
           {cells.map((date, i) => {
             const isToday = date ? sameDay(date, today) : false;
             const isWeekend = date ? date.getDay() === 0 || date.getDay() === 6 : false;
-            const dot = date ? dots[localDateKey(date)] : null;
+            const key = date ? localDateKey(date) : "";
+            const dot = date ? dots[key] : null;
+            const isHighlighted = date ? highlightedDates.has(key) : false;
             return (
               <div
                 key={i}
@@ -151,9 +184,13 @@ export function MonthCalendar({ tasks }: { tasks?: CalendarTask[] }) {
                 {date?.getDate() ?? ""}
                 {dot && (
                   <span
+                    title={titles[key]?.join("\n")}
                     aria-label={`${dot} priority task`}
                     className={cn(
-                      "absolute top-1.5 right-1.5 size-1.5 rounded-full ring-2 ring-[var(--card)]",
+                      "absolute right-1.5 top-1.5 rounded-full ring-[var(--card)] transition-all duration-200",
+                      isHighlighted
+                        ? "size-3 ring-[3px] animate-pulse"
+                        : "size-1.5 ring-2",
                       dotClass[dot],
                     )}
                   />
