@@ -101,6 +101,7 @@ function TasksPage() {
   const [newTime, setNewTime] = useState("");
   const [newPriority, setNewPriority] = useState("Medium");
   const [newDue, setNewDue] = useState("");
+  const [hoveredTaskId, setHoveredTaskId] = useState<string | null>(null);
 
   const plan = plans[mode] ?? emptyPlans[mode];
   const tasks = plan.tasks;
@@ -214,7 +215,7 @@ function TasksPage() {
       />
 
       <div className="mb-5">
-        <MonthCalendar tasks={plans.monthly?.tasks ?? []} />
+        <MonthCalendar tasks={plans.monthly?.tasks ?? []} highlightedTaskId={hoveredTaskId} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
@@ -367,7 +368,7 @@ function TasksPage() {
               ) : (
                 <ul className="space-y-3">
                   {tasks.map((t) => (
-                    <li key={t.id}>
+                    <li key={t.id} onMouseEnter={() => setHoveredTaskId(t.id)} onMouseLeave={() => setHoveredTaskId(null)}>
                       <Card className={cn(t.done && "opacity-60")}>
                         <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start">
                           <div className="min-w-0 flex-1 space-y-2">
@@ -466,6 +467,8 @@ function TasksPage() {
                         {group.tasks.map((t) => (
                           <li
                             key={t.id}
+                            onMouseEnter={() => setHoveredTaskId(t.id)}
+                            onMouseLeave={() => setHoveredTaskId(null)}
                             className="flex flex-wrap items-center gap-2 text-sm"
                           >
                             <span className="min-w-0 flex-1 font-medium">{t.title}</span>
