@@ -7,6 +7,7 @@ import {
   ListChecks,
   Loader2,
   Plus,
+  RefreshCw,
   Sparkles,
   Trash2,
   Undo2,
@@ -270,9 +271,12 @@ function TasksPage() {
 
         <div className="space-y-4">
           {error && (
-            <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-              {error}
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              <p>{error}</p>
+              <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
+                <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} /> Try again
+              </Button>
+            </div>
           )}
 
           <Tabs defaultValue="plan">

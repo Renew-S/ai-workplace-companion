@@ -74,6 +74,7 @@ function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastAttempt = useRef<{ messages: Message[]; attachments: Attachment[]; prompt: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [feedback, setFeedback] = useLocalStorage<Record<number, "up" | "down">>(
     "wai.chat.feedback",
@@ -401,7 +402,14 @@ function ChatPage() {
               <Loader2 className="size-4 animate-spin text-primary" /> Thinking…
             </div>
           )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <div className="flex flex-wrap items-center gap-2 text-sm text-destructive">
+              <p>{error}</p>
+              <Button size="sm" variant="outline" onClick={retryLast} disabled={loading}>
+                <RefreshCw className={cn("size-4", loading && "animate-spin")} /> Try again
+              </Button>
+            </div>
+          )}
           <div ref={endRef} />
         </CardContent>
 
