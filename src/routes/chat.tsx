@@ -9,6 +9,7 @@ import {
   Mic,
   MicOff,
   Paperclip,
+  RefreshCw,
   X,
   SendHorizonal,
   Share2,
@@ -240,6 +241,7 @@ function ChatPage() {
     setAttachments([]);
     setLoading(true);
     setError(null);
+    lastAttempt.current = { messages: next, attachments: sent, prompt: content };
     try {
       const res = await run({
         data: {
@@ -251,6 +253,29 @@ function ChatPage() {
       });
       setMessages([...next, { role: "assistant", content: res.content }]);
       logActivity("chat", content, res.content);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function retryLast() {
+    const attempt = lastAttempt.current;
+    if (!attempt || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await run({
+        data: {
+          messages: attempt.messages,
+          language: settings.language,
+          webSearch: settings.webSearch,
+          attachments: attempt.attachments,
+        },
+      });
+      setMessages([...attempt.messages, { role: "assistant", content: res.content }]);
+      logActivity("chat", attempt.prompt, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
