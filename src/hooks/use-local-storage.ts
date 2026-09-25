@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const EVENT = "wai:local-storage";
 
@@ -13,15 +13,20 @@ function read<T>(key: string, fallback: T): T {
 }
 
 export function useLocalStorage<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(() =>
-    typeof window === "undefined" ? initial : read(key, initial),
-  );
+  const [value, setValue] = useState<T>(initial);
+  const valueRef = useRef<T>(initial);
+  valueRef.current = value;
 
   useEffect(() => {
-    setValue(read(key, initial));
+    const stored = read(key, initial);
+    valueRef.current = stored;
+    setValue(stored);
     const onChange = (e: Event) => {
       const detail = (e as CustomEvent<{ key: string; value: unknown }>).detail;
-      if (detail?.key === key) setValue(detail.value as T);
+      if (detail?.key === key) {
+        valueRef.current = detail.value as T;
+        setValue(detail.value as T);
+      }
     };
     window.addEventListener(EVENT, onChange);
     return () => window.removeEventListener(EVENT, onChange);
@@ -30,19 +35,20 @@ export function useLocalStorage<T>(key: string, initial: T) {
 
   const set = useCallback(
     (next: T | ((prev: T) => T)) => {
-      setValue((prev) => {
-        const resolved =
-          typeof next === "function" ? (next as (p: T) => T)(prev) : next;
-        try {
-          localStorage.setItem(key, JSON.stringify(resolved));
-          window.dispatchEvent(
-            new CustomEvent(EVENT, { detail: { key, value: resolved } }),
-          );
-        } catch {
-          /* ignore */
-        }
-        return resolved;
-      });
+      const resolved =
+        typeof next === "function"
+          ? (next as (p: T) => T)(valueRef.current)
+          : next;
+      valueRef.current = resolved;
+      setValue(resolved);
+      try {
+        localStorage.setItem(key, JSON.stringify(resolved));
+      } catch {
+        /* ignore */
+      }
+      window.dispatchEvent(
+        new CustomEvent(EVENT, { detail: { key, value: resolved } }),
+      );
     },
     [key],
   );
