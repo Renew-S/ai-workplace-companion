@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Task reminder deadlines are derived client-side from each task's saved due date or plan horizon and suggested time; refresh the bell clock periodically because time passing does not change local storage.
