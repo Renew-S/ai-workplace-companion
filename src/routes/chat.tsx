@@ -9,6 +9,7 @@ import {
   Mic,
   MicOff,
   Paperclip,
+  RefreshCw,
   X,
   SendHorizonal,
   Share2,
@@ -73,6 +74,7 @@ function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastAttempt = useRef<{ messages: Message[]; attachments: Attachment[]; prompt: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [feedback, setFeedback] = useLocalStorage<Record<number, "up" | "down">>(
     "wai.chat.feedback",
@@ -240,6 +242,7 @@ function ChatPage() {
     setAttachments([]);
     setLoading(true);
     setError(null);
+    lastAttempt.current = { messages: next, attachments: sent, prompt: content };
     try {
       const res = await run({
         data: {
@@ -251,6 +254,29 @@ function ChatPage() {
       });
       setMessages([...next, { role: "assistant", content: res.content }]);
       logActivity("chat", content, res.content);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function retryLast() {
+    const attempt = lastAttempt.current;
+    if (!attempt || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await run({
+        data: {
+          messages: attempt.messages,
+          language: settings.language,
+          webSearch: settings.webSearch,
+          attachments: attempt.attachments,
+        },
+      });
+      setMessages([...attempt.messages, { role: "assistant", content: res.content }]);
+      logActivity("chat", attempt.prompt, res.content);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
@@ -376,7 +402,14 @@ function ChatPage() {
               <Loader2 className="size-4 animate-spin text-primary" /> Thinking…
             </div>
           )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <div className="flex flex-wrap items-center gap-2 text-sm text-destructive">
+              <p>{error}</p>
+              <Button size="sm" variant="outline" onClick={retryLast} disabled={loading}>
+                <RefreshCw className={cn("size-4", loading && "animate-spin")} /> Try again
+              </Button>
+            </div>
+          )}
           <div ref={endRef} />
         </CardContent>
 

@@ -170,9 +170,12 @@ function EmailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {error && (
-              <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-                {error}
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+                <p>{error}</p>
+                <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
+                  <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} /> Try again
+                </Button>
+              </div>
             )}
             {loading && !output ? (
               <div className="flex h-72 flex-col items-center justify-center gap-3 rounded-lg border border-dashed text-sm text-muted-foreground">
