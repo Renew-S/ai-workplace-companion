@@ -14,6 +14,7 @@ type PlannedTask = {
   priority: string;
   suggestedTime: string;
   dueDate?: string;
+  plannedAt?: string;
   done: boolean;
 };
 

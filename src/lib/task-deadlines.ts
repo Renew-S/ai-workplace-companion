@@ -1,6 +1,7 @@
 export type ReminderTask = {
   dueDate?: string;
   suggestedTime?: string;
+  plannedAt?: string;
   done: boolean;
 };
 
@@ -26,29 +27,27 @@ function lastClockTime(text: string): { hour: number; minute: number } | null {
 
 export function taskDeadline(task: ReminderTask, mode: string, now: Date): Date | null {
   const time = lastClockTime(task.suggestedTime ?? "");
+  const saved = task.plannedAt ? new Date(task.plannedAt) : null;
+  const anchor = saved && !Number.isNaN(saved.getTime()) ? saved : now;
   let deadline: Date | null = null;
 
   if (task.dueDate) {
     const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(task.dueDate);
     if (parts) deadline = endOfDay(Number(parts[1]), Number(parts[2]), Number(parts[3]));
   } else if (mode === "daily") {
-    deadline = endOfDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    deadline = endOfDay(anchor.getFullYear(), anchor.getMonth() + 1, anchor.getDate());
   } else if (mode === "weekly") {
     const weekday = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:day)?\b/i.exec(task.suggestedTime ?? "");
     const dayIndex = weekday ? ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].indexOf(weekday[1].slice(0, 3).toLowerCase()) : 6;
-    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
-    deadline = endOfDay(monday.getFullYear(), monday.getMonth() + 1, monday.getDate() + dayIndex);
-    // Date arithmetic across month boundaries must be performed on a Date.
-    if (!deadline) {
-      monday.setDate(monday.getDate() + dayIndex);
-      deadline = endOfDay(monday.getFullYear(), monday.getMonth() + 1, monday.getDate());
-    }
+    const monday = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - ((anchor.getDay() + 6) % 7));
+    monday.setDate(monday.getDate() + dayIndex);
+    deadline = endOfDay(monday.getFullYear(), monday.getMonth() + 1, monday.getDate());
   } else if (mode === "monthly") {
     const text = task.suggestedTime ?? "";
     const week = /\bWeek\s+\d+\s*\(.*?[–—-]\s*(\d{1,2})(?:st|nd|rd|th)?\)/i.exec(text);
     const dated = /\b(\d{1,2})(?:st|nd|rd|th)\b/i.exec(text);
-    const day = week ? Number(week[1]) : dated ? Number(dated[1]) : new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    deadline = endOfDay(now.getFullYear(), now.getMonth() + 1, day);
+    const day = week ? Number(week[1]) : dated ? Number(dated[1]) : new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0).getDate();
+    deadline = endOfDay(anchor.getFullYear(), anchor.getMonth() + 1, day);
   }
 
   if (deadline && time) deadline.setHours(time.hour, time.minute, 59, 999);

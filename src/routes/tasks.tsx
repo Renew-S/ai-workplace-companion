@@ -63,6 +63,7 @@ type PlannedTask = {
   suggestedTime: string;
   rationale: string;
   dueDate?: string;
+  plannedAt?: string;
   done: boolean;
 };
 
@@ -130,6 +131,7 @@ function TasksPage() {
               ...res.tasks.map((t, i) => ({
                 ...t,
                 id: `${Date.now()}-${i}`,
+                plannedAt: new Date().toISOString(),
                 done: false,
               })),
             ],
@@ -186,6 +188,7 @@ function TasksPage() {
               suggestedTime: newTime.trim() || "Unscheduled",
               rationale: "Added manually",
               dueDate: newDue || undefined,
+              plannedAt: new Date().toISOString(),
               done: false,
             },
           ],
