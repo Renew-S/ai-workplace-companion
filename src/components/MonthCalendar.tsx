@@ -93,7 +93,7 @@ export function MonthCalendar({
       if ((rank[p] ?? 0) > currentRank) map[key] = p as "high" | "medium" | "low";
       if (!taskTitles[key]) taskTitles[key] = [];
       taskTitles[key].push(task.title);
-      if (isTaskOverdue(task, "monthly", now)) overdue.add(key);
+      if (isTaskOverdue({ ...task, done: task.done ?? false }, "monthly", now)) overdue.add(key);
     }
     return { dots: map, titles: taskTitles, overdue };
   }, [tasks, cursor, now]);
