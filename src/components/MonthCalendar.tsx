@@ -46,7 +46,13 @@ export function MonthCalendar({
   highlightedTaskId?: string | null;
 }) {
   const today = useMemo(() => new Date(), []);
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30000);
+    return () => window.clearInterval(id);
+  }, []);
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+
 
   const cells = useMemo(() => {
     const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
@@ -63,6 +69,7 @@ export function MonthCalendar({
   const { dots, titles } = useMemo(() => {
     const map: Record<string, "high" | "medium" | "low"> = {};
     const taskTitles: Record<string, string[]> = {};
+    const overdue = new Set<string>();
     const rank: Record<string, number> = { high: 3, medium: 2, low: 1 };
     const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
     for (const task of tasks ?? []) {
@@ -86,9 +93,11 @@ export function MonthCalendar({
       if ((rank[p] ?? 0) > currentRank) map[key] = p as "high" | "medium" | "low";
       if (!taskTitles[key]) taskTitles[key] = [];
       taskTitles[key].push(task.title);
+      if (isTaskOverdue(task, "monthly", now)) overdue.add(key);
     }
-    return { dots: map, titles: taskTitles };
-  }, [tasks, cursor]);
+    return { dots: map, titles: taskTitles, overdue };
+  }, [tasks, cursor, now]);
+
 
   const highlightedDates = useMemo(() => {
     const set = new Set<string>();
