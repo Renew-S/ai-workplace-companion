@@ -2,6 +2,19 @@
 @source "../src";
 @import "tw-animate-css";
 
+@keyframes wai-dot-blink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.35);
+  }
+}
+
+
 @custom-variant dark (&:is(.dark *));
 
 /*
