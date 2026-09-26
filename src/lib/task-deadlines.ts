@@ -38,7 +38,7 @@ export function taskDeadline(task: ReminderTask, mode: string, now: Date): Date 
     deadline = endOfDay(anchor.getFullYear(), anchor.getMonth() + 1, anchor.getDate());
   } else if (mode === "weekly") {
     const weekday = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:day)?\b/i.exec(task.suggestedTime ?? "");
-    const dayIndex = weekday ? ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].indexOf(weekday[1].slice(0, 3).toLowerCase()) : 6;
+    const dayIndex = weekday ? ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].indexOf(weekday[1]!.slice(0, 3).toLowerCase()) : 6;
     const monday = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - ((anchor.getDay() + 6) % 7));
     monday.setDate(monday.getDate() + dayIndex);
     deadline = endOfDay(monday.getFullYear(), monday.getMonth() + 1, monday.getDate());
