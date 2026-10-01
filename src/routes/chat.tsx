@@ -512,6 +512,22 @@ function ChatPage() {
               }}
               className="max-h-32 min-h-11 resize-none"
             />
+            {lastPrompt && (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="Copy your last prompt"
+                title="Copy your last sent prompt"
+                className={cn(
+                  "text-primary-deep",
+                  copiedPrompt && "text-primary-deep ring-2 ring-primary",
+                )}
+                onClick={() => void copyLastPrompt()}
+              >
+                {copiedPrompt ? <Check className="size-4" /> : <Copy className="size-4" />}
+              </Button>
+            )}
             <Button
               type="submit"
               size="icon"
