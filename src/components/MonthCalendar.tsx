@@ -66,7 +66,7 @@ export function MonthCalendar({
     return list;
   }, [cursor]);
 
-  const { dots, titles } = useMemo(() => {
+  const { dots, titles, overdue } = useMemo(() => {
     const map: Record<string, "high" | "medium" | "low"> = {};
     const taskTitles: Record<string, string[]> = {};
     const overdue = new Set<string>();
@@ -196,12 +196,19 @@ export function MonthCalendar({
                 {dot && (
                   <span
                     title={titles[key]?.join("\n")}
-                    aria-label={`${dot} priority task`}
+                    aria-label={`${dot} priority task${overdue.has(key) ? " (overdue)" : ""}`}
+                    style={
+                      overdue.has(key) && !isHighlighted
+                        ? { animation: "wai-dot-blink 1.1s ease-in-out infinite" }
+                        : undefined
+                    }
                     className={cn(
                       "absolute right-1.5 top-1.5 rounded-full ring-[var(--card)] transition-all duration-200",
                       isHighlighted
                         ? "size-3 ring-[3px] animate-pulse"
-                        : "size-1.5 ring-2",
+                        : overdue.has(key)
+                          ? "size-2 ring-2"
+                          : "size-1.5 ring-2",
                       dotClass[dot],
                     )}
                   />
