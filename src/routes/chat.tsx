@@ -242,7 +242,7 @@ function ChatPage() {
     setMessages(next);
     setInput("");
     setAttachments([]);
-    setLastPrompt(content);
+    if (content) setLastPrompt(content);
     setLoading(true);
     setError(null);
     lastAttempt.current = { messages: next, attachments: sent, prompt: content };
