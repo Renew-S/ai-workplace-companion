@@ -81,6 +81,8 @@ function ChatPage() {
     {},
   );
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [lastPrompt, setLastPrompt] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [listening, setListening] = useState(false);
@@ -209,6 +211,18 @@ function ChatPage() {
     }
   }
 
+  async function copyLastPrompt() {
+    if (!lastPrompt) return;
+    try {
+      await navigator.clipboard.writeText(lastPrompt);
+      setCopiedPrompt(true);
+      setTimeout(() => setCopiedPrompt(false), 1500);
+      toast.success("Prompt copied");
+    } catch {
+      toast.error("Could not copy the prompt.");
+    }
+  }
+
   async function shareMessage(index: number, text: string) {
     const prompt = [...messages.slice(0, index)].reverse().find((m) => m.role === "user")?.content;
     const payload = `Prompt: ${prompt ?? "—"}\n\nAI response:\n${text}`;
@@ -240,6 +254,7 @@ function ChatPage() {
     setMessages(next);
     setInput("");
     setAttachments([]);
+    if (content) setLastPrompt(content);
     setLoading(true);
     setError(null);
     lastAttempt.current = { messages: next, attachments: sent, prompt: content };
@@ -298,6 +313,7 @@ function ChatPage() {
           onClick={() => {
             setMessages([]);
             setError(null);
+            setLastPrompt("");
           }}
         >
           <Trash2 className="size-4" /> Clear chat
@@ -496,6 +512,22 @@ function ChatPage() {
               }}
               className="max-h-32 min-h-11 resize-none"
             />
+            {lastPrompt && (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="Copy your last prompt"
+                title="Copy your last sent prompt"
+                className={cn(
+                  "text-primary-deep",
+                  copiedPrompt && "text-primary-deep ring-2 ring-primary",
+                )}
+                onClick={() => void copyLastPrompt()}
+              >
+                {copiedPrompt ? <Check className="size-4" /> : <Copy className="size-4" />}
+              </Button>
+            )}
             <Button
               type="submit"
               size="icon"
