@@ -81,6 +81,8 @@ function ChatPage() {
     {},
   );
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [lastPrompt, setLastPrompt] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [listening, setListening] = useState(false);
