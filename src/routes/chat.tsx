@@ -242,6 +242,7 @@ function ChatPage() {
     setMessages(next);
     setInput("");
     setAttachments([]);
+    setLastPrompt(content);
     setLoading(true);
     setError(null);
     lastAttempt.current = { messages: next, attachments: sent, prompt: content };
@@ -300,6 +301,7 @@ function ChatPage() {
           onClick={() => {
             setMessages([]);
             setError(null);
+            setLastPrompt("");
           }}
         >
           <Trash2 className="size-4" /> Clear chat
