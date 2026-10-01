@@ -211,6 +211,18 @@ function ChatPage() {
     }
   }
 
+  async function copyLastPrompt() {
+    if (!lastPrompt) return;
+    try {
+      await navigator.clipboard.writeText(lastPrompt);
+      setCopiedPrompt(true);
+      setTimeout(() => setCopiedPrompt(false), 1500);
+      toast.success("Prompt copied");
+    } catch {
+      toast.error("Could not copy the prompt.");
+    }
+  }
+
   async function shareMessage(index: number, text: string) {
     const prompt = [...messages.slice(0, index)].reverse().find((m) => m.role === "user")?.content;
     const payload = `Prompt: ${prompt ?? "—"}\n\nAI response:\n${text}`;
